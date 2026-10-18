@@ -68,8 +68,6 @@ export const addCartItem = async (userId, productId, quantity) => {
 };
 
 export const updateCartItem = async (userId, productId, quantity) => {
-  console.log({ userId, productId, quantity });
-
   const result = await query(
     `UPDATE cart_items
      SET quantity = $1
@@ -79,13 +77,10 @@ export const updateCartItem = async (userId, productId, quantity) => {
     [quantity, userId, productId],
   );
 
-
   return result.rows[0] ?? null;
 };
 
 export const removeCartItem = async (userId, productId) => {
-  console.log({ userId, productId });
-
   const result = await query(
     `DELETE FROM cart_items
      WHERE user_id = $1
@@ -93,7 +88,6 @@ export const removeCartItem = async (userId, productId) => {
      RETURNING *`,
     [userId, productId],
   );
-
 
   return result.rows[0] ?? null;
 };

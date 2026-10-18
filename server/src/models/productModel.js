@@ -37,6 +37,7 @@ export const getProducts = async ({
   maxPrice,
   condition,
   sortBy = "newest",
+  search, // 1. Accept search/q from controller query params
 }) => {
   const conditions = [];
   const values = [];
@@ -58,9 +59,16 @@ export const getProducts = async ({
     addCondition("p.price <= ?", maxPrice);
   }
 
-  // Only use this if your products table has a condition column.
   if (condition) {
     addCondition("p.condition = ?", condition);
+  }
+
+  // 2. Add keyword search condition for name and description
+  if (search && search.trim() !== "") {
+    values.push(`%${search.trim()}%`);
+    conditions.push(
+      `(p.name ILIKE $${values.length} OR p.description ILIKE $${values.length})`,
+    );
   }
 
   const sortOptions = {
@@ -99,7 +107,7 @@ export const getProducts = async ({
       ${whereClause}
       ORDER BY ${orderBy}
     `,
-    values
+    values,
   );
 
   return result.rows;
@@ -195,7 +203,7 @@ export const updateProduct = async (
       WHERE id = $7
       RETURNING *
     `,
-    [name, description, price, stock,condition, category_id, id],
+    [name, description, price, stock, condition, category_id, id],
   );
 
   return result.rows[0];

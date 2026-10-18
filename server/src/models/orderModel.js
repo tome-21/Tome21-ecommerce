@@ -1,6 +1,6 @@
 import { getClient, query } from "../config/db.js";
 
-export const createOrder = async (userId, shippingAddress) => {
+export const createOrder = async (userId, shippingAddress, shippingPhone) => {
   const client = await getClient();
 
   try {
@@ -46,12 +46,13 @@ export const createOrder = async (userId, shippingAddress) => {
         INSERT INTO orders (
           user_id,
           total_amount,
-          shipping_address
+          shipping_address,
+          shipping_phone
         )
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
       `,
-      [userId, total, shippingAddress],
+      [userId, total, shippingAddress, shippingPhone],
     );
 
     const order = orderResult.rows[0];
@@ -114,6 +115,7 @@ export const getOrdersByUserId = async (userId) => {
         total_amount,
         status,
         shipping_address,
+        shipping_phone,
         created_at,
         updated_at
       FROM orders
@@ -134,6 +136,7 @@ export const getOrderById = async (userId, orderId) => {
         total_amount,
         status,
         shipping_address,
+        shipping_phone,
         created_at,
         updated_at
       FROM orders
@@ -183,6 +186,7 @@ export const getAllOrders = async () => {
         o.total_amount,
         o.status,
         o.shipping_address,
+        o.shipping_phone,
         o.created_at,
         o.updated_at
       FROM orders o
@@ -206,6 +210,7 @@ export const getOrderByIdForAdmin = async (orderId) => {
         o.total_amount,
         o.status,
         o.shipping_address,
+        o.shipping_phone,
         o.created_at,
         o.updated_at
       FROM orders o
@@ -245,21 +250,38 @@ export const getOrderByIdForAdmin = async (orderId) => {
 };
 
 export const updateOrderStatus = async (orderId, status) => {
+  const isCancel = status === "cancelled";
+
   const result = await query(
     `
-      UPDATE orders
-      SET
-        status = $1,
-        updated_at = NOW()
-      WHERE id = $2
-      RETURNING *
+      WITH target AS (
+        SELECT id, status
+        FROM orders
+        WHERE id = $2
+        FOR UPDATE
+      ),
+      restock AS (
+        UPDATE products p
+        SET stock = p.stock + items.qty
+        FROM (
+          SELECT oi.product_id, SUM(oi.quantity) AS qty
+          FROM order_items oi
+          WHERE oi.order_id = $2
+          GROUP BY oi.product_id
+        ) items, target
+        WHERE $3::boolean
+          AND target.status <> 'cancelled'
+          AND p.id = items.product_id
+      )
+      UPDATE orders o
+      SET status = $1, updated_at = NOW()
+      FROM target
+      WHERE o.id = target.id
+        AND target.status <> 'cancelled'
+      RETURNING o.*
     `,
-    [status, orderId],
+    [status, orderId, isCancel],
   );
 
-  if (result.rows.length === 0) {
-    return null;
-  }
-
-  return result.rows[0];
+  return result.rows[0] || null;
 };

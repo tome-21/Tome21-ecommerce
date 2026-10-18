@@ -1,103 +1,85 @@
-import {} from "react";
+import { Link } from "react-router-dom";
+
+/* Edit links and contact details here. Change the `to` paths to match your routes. */
+const SUPPORT_EMAIL = "tome2100000@gmail.com";
+
+const COLUMNS = [
+  {
+    title: "Shop",
+    links: [
+      { label: "All products", to: "/products" },
+      { label: "My orders", to: "/orders" },
+      { label: "Cart", to: "/cart" },
+    ],
+  },
+  {
+    title: "About us",
+    links: [
+      { label: "About Tome21", to: "/about" },
+      { label: "Terms and conditions", to: "/terms" },
+      { label: "Privacy policy", to: "/privacy" },
+      { label: "Billing policy", to: "/billing" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "Contact us", to: "/contact" },
+      { label: "FAQ", to: "/faq" },
+      { label: "Safety tips", to: "/safety" },
+    ],
+  },
+];
+
+const linkClass =
+  "inline-block rounded text-gray-600 hover:text-[#2f7d1b] hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-200 pt-12 pb-8 mt-12 text-sm text-gray-600">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Brand Col */}
-        <div className="flex flex-col">
-          <div className="text-2xl font-extrabold tracking-tight text-[#3e9d24] mb-4">
+    <footer className="bg-white border-t border-gray-200 mt-12 text-sm text-gray-600">
+      <div className="max-w-7xl mx-auto px-4 pt-10 pb-8 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+        {/* Brand */}
+        <div className="col-span-2 md:col-span-1">
+          <Link
+            to="/"
+            className="inline-block text-2xl font-extrabold tracking-tight text-[#3e9d24] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2"
+            aria-label="Tome21 home"
+          >
             Tome<span className="text-yellow-400">21</span>
-          </div>
-          <p className="mb-4 text-gray-500">
-            The fastest-growing free classifieds in Ethiopia. Sell anything to
-            real people.
+          </Link>
+          <p className="mt-3 text-gray-500 max-w-xs">
+            Quality products delivered to your door in Ethiopia.
           </p>
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className={`mt-4 font-medium ${linkClass}`}
+          >
+            {SUPPORT_EMAIL}
+          </a>
         </div>
 
-        {/* Links Col 1 */}
-        <div>
-          <h4 className="font-bold text-gray-800 mb-4 uppercase tracking-wider">
-            About Us
-          </h4>
-          <ul className="space-y-3">
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                About Tome21
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                Terms & Conditions
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                Privacy Policy
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                Billing Policy
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        {/* Links Col 2 */}
-        <div>
-          <h4 className="font-bold text-gray-800 mb-4 uppercase tracking-wider">
-            Support
-          </h4>
-          <ul className="space-y-3">
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                support@123.com
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                Safety Tips
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                Contact Us
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#3e9d24] transition-colors">
-                FAQ
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        {/* App Links */}
-        <div>
-          <h4 className="font-bold text-gray-800 mb-4 uppercase tracking-wider">
-            Our Apps
-          </h4>
-          <div className="flex flex-col space-y-3">
-            <button className="flex items-center gap-3 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-              <div className="flex flex-col text-left">
-                <span className="text-[10px] uppercase">Get it on</span>
-                <span className="font-bold text-sm">Google Play</span>
-              </div>
-            </button>
-            <button className="flex items-center gap-3 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-              <div className="flex flex-col text-left">
-                <span className="text-[10px] uppercase">Download on the</span>
-                <span className="font-bold text-sm">App Store</span>
-              </div>
-            </button>
-          </div>
-        </div>
+        {/* Link columns */}
+        {COLUMNS.map((col) => (
+          <nav key={col.title} aria-label={col.title}>
+            <h4 className="font-bold text-gray-900 mb-3">{col.title}</h4>
+            <ul className="space-y-2.5">
+              {col.links.map((l) => (
+                <li key={l.label}>
+                  <Link to={l.to} className={linkClass}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 mt-12 pt-6 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
-        <p>© 2026 Tome21. All rights reserved.</p>
-        <p className="mt-2 md:mt-0">Designed in Addis Ababa</p>
+      <div className="border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-1 text-xs text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Tome21. All rights reserved.</p>
+          <p>Made in Addis Ababa</p>
+        </div>
       </div>
     </footer>
   );

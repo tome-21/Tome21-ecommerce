@@ -21,13 +21,22 @@ export const getFeaturedProducts = async (req, res) => {
 
 export const getProductsController = async (req, res) => {
   try {
-    const products = await getProducts(req.query);
-    res.status(200).json(products);
-  } catch (error) {
-    console.error("Error getting products:", error);
-    res.status(500).json({
-      error: "Failed to get products",
+    const { categoryId, minPrice, maxPrice, condition, sortBy, q, search } =
+      req.query;
+
+    const products = await getProducts({
+      categoryId,
+      minPrice,
+      maxPrice,
+      condition,
+      sortBy,
+      search: q || search,
     });
+
+    res.json(products);
+  } catch (err) {
+    console.error("Failed to fetch products:", err);
+    res.status(500).json({ error: "Server error" });
   }
 };
 

@@ -338,7 +338,8 @@ POST /api/orders
 
 Body:
 {
-"shipping_address": "Bole, Addis Ababa"
+"shipping_address": "Bole, Addis Ababa",
+"shipping_phone": --------,
 }
 
 response:
@@ -348,6 +349,7 @@ response:
 "total_amount": "9000.00",
 "status": "pending",
 "shipping_address": "Bole, Addis Ababa",
+"shipping_phone": "+2519--------",
 "created_at": "2026-10-05T12:13:08.961Z",
 "updated_at": "2026-10-05T12:13:08.961Z"
 }
@@ -366,6 +368,7 @@ response:
 "total_amount": "9000.00",
 "status": "pending",
 "shipping_address": "Bole, Addis Ababa",
+"shipping_phone": "+2519--------",
 "created_at": "2026-10-05T12:13:08.961Z",
 "updated_at": "2026-10-05T12:13:08.961Z"
 }
@@ -382,6 +385,7 @@ Response:
 "total_amount": "9000.00",
 "status": "pending",
 "shipping_address": "Bole, Addis Ababa",
+"shipping_phone": "+2519--------",
 "created_at": "2026-10-05T12:13:08.961Z",
 "updated_at": "2026-10-05T12:13:08.961Z",
 "items": [

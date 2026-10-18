@@ -2,22 +2,29 @@ import {
   createOrder,
   getOrdersByUserId,
   getOrderById,
-  getAllOrders,
-  getOrderByIdForAdmin,
 } from "../models/orderModel.js";
 
 export const checkout = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { shipping_address } = req.body;
+    const { shipping_address, shipping_phone } = req.body;
 
-    if (!shipping_address || !shipping_address.trim()) {
+    if (
+      !shipping_address ||
+      !shipping_address.trim() ||
+      !shipping_phone ||
+      !shipping_phone.trim()
+    ) {
       return res.status(400).json({
         error: "shipping_address is required",
       });
     }
 
-    const order = await createOrder(userId, shipping_address.trim());
+    const order = await createOrder(
+      userId,
+      shipping_address.trim(),
+      shipping_phone.trim(),
+    );
 
     res.status(201).json(order);
   } catch (error) {

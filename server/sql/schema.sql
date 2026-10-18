@@ -22,6 +22,7 @@ CREATE TABLE users (
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
+    image_url TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -114,7 +115,7 @@ CREATE TABLE orders (
         )),
 
     shipping_address TEXT NOT NULL,
-
+    shipping_phone VARCHAR(20) NOT NULL DEFAULT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

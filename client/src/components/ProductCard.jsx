@@ -1,74 +1,133 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const ProductCard = ({ product, onClick }) => {
-  // Convert price string to number for formatting
-  const numericPrice = Number(product.price);
-  const formattedPrice = isNaN(numericPrice)
-    ? product.price
-    : numericPrice.toLocaleString("en-US", { minimumFractionDigits: 2 });
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
+
+const formatPrice = (value) => {
+  const n = Number(value);
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    Number.isNaN(n)
+  ) {
+    return value ?? "";
+  }
+  // 12500 -> 12,500 and 99.5 -> 99.50
+  return n.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+/**
+ * Props
+ * - product: { id, name, price, image_url, stock, category_name }
+ * - onClick(product): optional, runs when the card is clicked
+ * - onAddToCart(product): optional, shows an "Add to cart" button when provided
+ */
+const ProductCard = ({ product, onClick, onAddToCart }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const hasStock = product.stock !== undefined && product.stock !== null;
+  const stock = Number(product.stock);
+  const outOfStock = hasStock && stock <= 0;
+  const lowStock = hasStock && stock > 0 && stock <= 5;
 
   return (
-    <div
-      onClick={() => onClick && onClick(product)}
-      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer relative"
+    <article
+      onClick={() => onClick?.(product)}
+      className="group relative flex flex-col h-full bg-white rounded-xl border border-gray-200 overflow-hidden transition-shadow duration-200 hover:shadow-lg"
     >
-      {/* Image Container */}
-      <Link to={`/products/${product.id}`}>
-        {" "}
-        <div className="h-48 bg-gray-100 relative overflow-hidden">
+      {/* Image */}
+      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+        {imgFailed || !product.image_url ? (
+          <div className="w-full h-full flex items-center justify-center text-gray-300">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-12 h-12"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <path d="M21 15l-5-5L5 21" />
+            </svg>
+          </div>
+        ) : (
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            onError={() => setImgFailed(true)}
+            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none ${
+              outOfStock ? "opacity-60" : ""
+            }`}
           />
-          {/*  Stock Badge */}
-          {product.stock <= 5 && product.stock > 0 && (
-            <span className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-              Only {product.stock} Left
-            </span>
+        )}
+
+        {lowStock && (
+          <span className="absolute top-2 left-2 bg-amber-500 text-white text-xs font-semibold px-2 py-0.5 rounded-md">
+            Only {stock} left
+          </span>
+        )}
+
+        {outOfStock && (
+          <span className="absolute top-2 left-2 bg-gray-800 text-white text-xs font-semibold px-2 py-0.5 rounded-md">
+            Out of stock
+          </span>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col flex-grow p-3 sm:p-4">
+        {product.category_name && (
+          <p className="text-xs text-gray-500 truncate mb-1">
+            {product.category_name}
+          </p>
+        )}
+
+        {/* Stretched link: the whole card is clickable, one tab stop */}
+        <h3 className="text-sm sm:text-base font-medium text-gray-800 leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#2f7d1b] transition-colors">
+          <Link
+            to={`/products/${product.id}`}
+            className={`rounded after:absolute after:inset-0 after:content-[''] ${focusRing}`}
+          >
+            {product.name}
+          </Link>
+        </h3>
+
+        <div className="mt-auto pt-3">
+          <p className="text-lg sm:text-xl font-bold text-[#2f7d1b] leading-none">
+            <span className="text-xs sm:text-sm font-semibold mr-1">ETB</span>
+            {formatPrice(product.price)}
+          </p>
+
+          {onAddToCart && (
+            <button
+              type="button"
+              disabled={outOfStock}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddToCart(product);
+              }}
+              className={`relative z-10 mt-3 w-full rounded-lg py-2 text-sm font-semibold transition-colors ${focusRing} ${
+                outOfStock
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-[#3e9d24] text-white hover:bg-[#2f7d1b]"
+              }`}
+            >
+              {outOfStock ? "Out of stock" : "Add to cart"}
+            </button>
           )}
         </div>
-      </Link>
-
-      {/* Card Content */}
-      <div className="p-4 flex flex-col flex-grow">
-        {/* Category Badge with Correct Tag Icon */}
-        <div className="flex items-center text-xs text-gray-500 mb-1.5 gap-1">
-          <svg
-            className="w-3.5 h-3.5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M7 7h.01M7 3h5a1 1 0 01.707.293l7 7a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-7-7A1 1 0 013 12V5a2 2 0 012-2z"
-            />
-          </svg>
-          <span className="truncate">{product.category_name}</span>
-        </div>
-
-        {/* Product Title */}
-        <h4 className="text-gray-800 font-medium line-clamp-2 leading-snug group-hover:text-[#3e9d24] transition-colors mb-2">
-          {product.name}
-        </h4>
-
-        {/* Price & Action */}
-        <div className="mt-auto pt-2 flex items-center justify-between">
-          <div>
-            <span className="text-xs text-gray-400 font-medium block">
-              Price
-            </span>
-            <p className="text-[#3e9d24] text-lg font-bold leading-none">
-              ETB {formattedPrice}
-            </p>
-          </div>
-        </div>
       </div>
-    </div>
+    </article>
   );
 };
 

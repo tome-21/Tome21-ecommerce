@@ -109,7 +109,8 @@ POST /catagories
 
 body:
 {
-"name": "Electronics"
+"name": "Electronics",
+"image_url": "www.kgkj.com"
 }
 
 ### Get all catagories
@@ -122,6 +123,7 @@ response:
 {
 "id": "2",
 "name": "Electronics",
+"image_url": "www.kgkj.com",
 "created_at": "2026-10-04T13:16:31.427Z"
 }
 ]
@@ -135,6 +137,7 @@ response:
 {
 "id": "2",
 "name": "Electronics",
+"image_url": "www.kgkj.com",
 "created_at": "2026-10-04T13:16:31.427Z"
 }
 
@@ -145,7 +148,7 @@ PUT /categories/1 (:id)
 Body:
 {
 "name": "Running Shoes"
-
+"image_url": "www.kgkj.com"
 }
 
 Response: {id + itself}
@@ -348,6 +351,7 @@ response:
 "total_amount": "9000.00",
 "status": "pending",
 "shipping_address": "Bole, Addis Ababa",
+"shipping_phone": "+2519--------",
 "created_at": "2026-10-05T12:13:08.961Z",
 "updated_at": "2026-10-05T12:13:08.961Z"
 }
@@ -366,6 +370,7 @@ response:
 "total_amount": "9000.00",
 "status": "pending",
 "shipping_address": "Bole, Addis Ababa",
+"shipping_phone": "+2519--------",
 "created_at": "2026-10-05T12:13:08.961Z",
 "updated_at": "2026-10-05T12:13:08.961Z"
 }
@@ -382,6 +387,7 @@ Response:
 "total_amount": "9000.00",
 "status": "pending",
 "shipping_address": "Bole, Addis Ababa",
+"shipping_phone": "+2519--------",
 "created_at": "2026-10-05T12:13:08.961Z",
 "updated_at": "2026-10-05T12:13:08.961Z",
 "items": [
