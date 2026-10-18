@@ -16,13 +16,10 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login",
+    failureRedirect: "http://localhost:5173/login",
   }),
   (req, res) => {
-    res.json({
-      message: "Login successful",
-      user: req.user,
-    });
+    res.redirect("http://localhost:5173/");
   },
 );
 
@@ -40,8 +37,16 @@ router.post("/logout", requireAuth, (req, res, next) => {
       return next(error);
     }
 
-    res.json({
-      message: "Logged out successfully",
+    req.session.destroy((error) => {
+      if (error) {
+        return next(error);
+      }
+
+      res.clearCookie("connect.sid");
+
+      res.json({
+        message: "Logged out successfully",
+      });
     });
   });
 });

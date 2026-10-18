@@ -27,7 +27,7 @@ export const getCartByUserId = async (userId) => {
       WHERE ci.user_id = $1
       ORDER BY ci.id DESC
     `,
-    [userId]
+    [userId],
   );
 
   const items = result.rows;
@@ -40,7 +40,7 @@ export const getCartByUserId = async (userId) => {
         ON p.id = ci.product_id
       WHERE ci.user_id = $1
     `,
-    [userId]
+    [userId],
   );
 
   return {
@@ -61,45 +61,42 @@ export const addCartItem = async (userId, productId, quantity) => {
 
       RETURNING *
     `,
-    [userId, productId, quantity]
+    [userId, productId, quantity],
   );
 
   return result.rows[0];
 };
 
-export const updateCartItem = async (
-  userId,
-  productId,
-  quantity
-) => {
+export const updateCartItem = async (userId, productId, quantity) => {
+  console.log({ userId, productId, quantity });
+
   const result = await query(
-    `
-      UPDATE cart_items
-      SET quantity = $1
-      WHERE user_id = $2
-        AND product_id = $3
-      RETURNING *
-    `,
-    [quantity, userId, productId]
+    `UPDATE cart_items
+     SET quantity = $1
+     WHERE user_id = $2
+       AND product_id = $3
+     RETURNING *`,
+    [quantity, userId, productId],
   );
 
-  return result.rows[0];
+
+  return result.rows[0] ?? null;
 };
 
 export const removeCartItem = async (userId, productId) => {
+  console.log({ userId, productId });
+
   const result = await query(
-    `
-      DELETE FROM cart_items
-      WHERE user_id = $1
-        AND product_id = $2
-      RETURNING *
-    `,
-    [userId, productId]
+    `DELETE FROM cart_items
+     WHERE user_id = $1
+       AND product_id = $2
+     RETURNING *`,
+    [userId, productId],
   );
 
-  return result.rows[0];
-};
 
+  return result.rows[0] ?? null;
+};
 
 export const clearCart = async (userId) => {
   await query(
@@ -107,6 +104,6 @@ export const clearCart = async (userId) => {
       DELETE FROM cart_items
       WHERE user_id = $1
     `,
-    [userId]
+    [userId],
   );
 };

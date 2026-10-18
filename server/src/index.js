@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { query } from "./config/db.js";
 const app = express();
-import cors from "cors"
+import cors from "cors";
 const port = process.env.PORT || 5000;
 
 import productRoutes from "./routes/productRoutes.js";
@@ -13,7 +13,6 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 
 // auth
-
 import session from "express-session";
 import passport from "./config/passport.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -21,8 +20,15 @@ import authRoutes from "./routes/authRoutes.js";
 // admin
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 
+// CRITICAL FIX: CORS must allow credentials (cookies/sessions) and your frontend origin
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173", // Change if your frontend runs elsewhere
+    credentials: true,
+  }),
+);
+
 app.use(express.json());
-app.use(cors());
 
 app.get("/api", async (req, res) => {
   try {
@@ -33,41 +39,27 @@ app.get("/api", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Database connection Faild" });
+    res.status(500).json({ error: "Database connection Failed" });
   }
 });
 
-//auth
-
+// auth sessions
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // true if HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    },
   }),
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/api/auth", authRoutes);
-// initial schema creator
-
-// import { readFile } from "node:fs/promises";
-
-// app.get("/create-tables", async (req, res) => {
-//   try {
-//     const schemaPath = new URL("../sql/schema.sql", import.meta.url);
-
-//     const schemaSql = await readFile(schemaPath, "utf8");
-
-//     await query(schemaSql);
-
-//     res.status(200).json({ message: "Tables created successfully!" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "tables creation failure" });
-//   }
-// });
 
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const ProductCard = ({ product, onAddToCart, onClick }) => {
+const ProductCard = ({ product, onClick }) => {
   // Convert price string to number for formatting
   const numericPrice = Number(product.price);
   const formattedPrice = isNaN(numericPrice)
@@ -13,7 +13,8 @@ const ProductCard = ({ product, onAddToCart, onClick }) => {
       className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer relative"
     >
       {/* Image Container */}
-      <Link to="/product-details">
+      <Link to={`/products/${product.id}`}>
+        {" "}
         <div className="h-48 bg-gray-100 relative overflow-hidden">
           <img
             src={product.image_url}
@@ -65,30 +66,6 @@ const ProductCard = ({ product, onAddToCart, onClick }) => {
               ETB {formattedPrice}
             </p>
           </div>
-
-          {/* Quick Add Button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // Prevents triggering card onClick
-              onAddToCart && onAddToCart(product);
-            }}
-            title="Add to Cart"
-            className="bg-yellow-400 text-gray-900 p-2.5 rounded-full shadow hover:bg-yellow-300 hover:scale-110 active:scale-95 transition-all duration-200"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     </div>

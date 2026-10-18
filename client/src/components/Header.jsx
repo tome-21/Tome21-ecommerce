@@ -1,27 +1,35 @@
-import {} from "react";
 import { Link } from "react-router-dom";
+import HeaderAuth from "./HeaderAuth";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-[#3e9d24] shadow-md text-white font-sans">
-      {/* Main Top Nav */}
+    <header className="sticky top-0 z-50 bg-[#3e9d24] text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <Link to="/">
-          <div className="text-3xl font-extrabold tracking-tight cursor-pointer">
-            Tome<span className="text-yellow-300">21</span>
-          </div>
+        {/* Logo */}
+        <Link
+          to="/"
+          className="text-2xl sm:text-3xl font-black tracking-tight shrink-0"
+        >
+          Tome<span className="text-yellow-300">21</span>
         </Link>
 
         {/* Search Bar */}
-        <div className="hidden md:flex flex-1 max-w-2xl relative shadow-sm rounded-lg overflow-hidden bg-white">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="hidden md:flex flex-1 max-w-xl items-center bg-white rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-yellow-400"
+        >
           <input
             type="text"
-            placeholder="I am looking for..."
-            className="w-full pl-4 pr-12 py-3 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            placeholder="Search products..."
+            className="w-full px-4 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
           />
-          <button className="absolute right-0 top-0 bottom-0 px-4 bg-white text-[#3e9d24] hover:bg-gray-100 transition-colors flex items-center justify-center border-l border-gray-200">
+          <button
+            type="submit"
+            aria-label="Search"
+            className="px-4 py-2 text-[#3e9d24] hover:bg-gray-100 transition-colors"
+          >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -34,11 +42,16 @@ export default function Header() {
               />
             </svg>
           </button>
-        </div>
+        </form>
 
-        {/* Right Actions */}
-        <div className="flex items-center space-x-6">
-          <div className="cursor-pointer hidden lg:flex items-center space-x-1  hover:text-yellow-200 transition">
+        {/* Auth & Cart Actions */}
+        <div className="flex items-center gap-3">
+          <HeaderAuth />
+
+          <Link
+            to="/cart"
+            className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow-sm transition-all active:scale-95 shrink-0"
+          >
             <svg
               className="w-5 h-5"
               fill="none"
@@ -49,40 +62,20 @@ export default function Header() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
               />
             </svg>
-            <span className="font-semibold text-sm">Sign In</span>
-          </div>
-
-          {/* Cart Button */}
-          <Link to="/cart">
-            <button className="cursor-pointer bg-yellow-400 text-gray-900 px-6 py-2 rounded-lg font-bold shadow-sm hover:bg-yellow-300 hover:shadow transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              CART
-            </button>
+            <span className="hidden sm:inline">Cart</span>
           </Link>
         </div>
       </div>
 
-      {/* Mobile only Search */}
+      {/* Mobile Search Bar */}
       <div className="md:hidden px-4 pb-3">
         <input
           type="text"
-          placeholder="I am looking for..."
-          className="w-full px-4 py-2 rounded-lg text-gray-800 bg-white shadow-inner focus:outline-none"
+          placeholder="Search products..."
+          className="w-full px-4 py-2 text-sm text-gray-800 bg-white rounded-lg placeholder-gray-400 focus:outline-none"
         />
       </div>
     </header>
