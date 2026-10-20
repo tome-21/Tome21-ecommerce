@@ -6,7 +6,10 @@ import {
   deleteCategory,
 } from "../models/catagoryModel.js";
 import cloudinary from "../config/cloudinary.js";
-import uploadImage from "../services/cloudinaryService.js";
+import {
+  uploadImage,
+  deleteCloudinaryImage,
+} from "../services/cloudinaryService.js";
 
 export const getCategories = async (req, res) => {
   try {
@@ -189,36 +192,29 @@ export const deleteCategoryController = async (req, res) => {
 
     let imageCleanupFailed = false;
 
-    // Delete the corresponding image from Cloudinary.
+    // Delete the corresponding Cloudinary image.
     if (category.public_id) {
       try {
-        const result = await cloudinary.uploader.destroy(category.public_id, {
-          resource_type: "image",
-        });
-
-        if (!["ok", "not found"].includes(result.result)) {
-          imageCleanupFailed = true;
-          console.error("Cloudinary category image cleanup failed:", result);
-        }
-      } catch (error) {
+        await deleteCloudinaryImage(category.public_id);
+      } catch (cleanupError) {
         imageCleanupFailed = true;
-        console.error("Cloudinary category image cleanup failed:", error);
+        console.error(
+          "Cloudinary category image cleanup failed:",
+          cleanupError,
+        );
       }
     }
-
-    const { public_id, ...categoryData } = category;
 
     return res.status(200).json({
       message: imageCleanupFailed
         ? "Category deleted, but image cleanup failed"
         : "Category deleted successfully",
-      data: categoryData,
+      data: category,
       imageCleanupFailed,
     });
   } catch (error) {
     console.error("Error deleting category:", error);
 
-    // PostgreSQL foreign-key violations, for example.
     if (error.code === "23503") {
       return res.status(409).json({
         error:

@@ -7,6 +7,7 @@ import {
   getProducts,
 } from "../models/productModel.js";
 import cloudinary from "../config/cloudinary.js";
+import { deleteCloudinaryImage } from "../services/cloudinaryService.js";
 import { getImagesByProductId } from "../models/productImageModel.js";
 
 export const getFeaturedProducts = async (req, res) => {
@@ -142,10 +143,9 @@ export const deleteProductController = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Save image IDs before the database cascade deletes their records.
+    // Get image records before deleting the product.
     const images = await getImagesByProductId(id);
 
-    // 2. Delete the product from PostgreSQL.
     const product = await deleteProduct(id);
 
     if (!product) {
@@ -154,34 +154,33 @@ export const deleteProductController = async (req, res) => {
       });
     }
 
-    // 3. Delete its images from Cloudinary.
-    const results = await Promise.allSettled(
-      images
-        .filter((image) => image.public_id)
-        .map((image) =>
-          cloudinary.uploader.destroy(image.public_id, {
-            resource_type: "image",
-          }),
-        ),
-    );
+    let imageCleanupFailed = false;
 
-    // 4. Detect cleanup failures without undoing product deletion.
-    const cleanupFailed = results.some(
-      (result) =>
-        result.status === "rejected" ||
-        !["ok", "not found"].includes(result.value?.result),
-    );
+    // Delete associated images from Cloudinary.
+    for (const image of images) {
+      if (!image.public_id) {
+        imageCleanupFailed = true;
+        console.error(`Image ${image.id} has no public_id`);
+        continue;
+      }
 
-    if (cleanupFailed) {
-      console.error(
-        `Cloudinary cleanup failed for product ${id}. Some images may remain.`,
-      );
+      try {
+        await deleteCloudinaryImage(image.public_id);
+      } catch (cleanupError) {
+        imageCleanupFailed = true;
+        console.error(
+          `Failed to delete image ${image.public_id}:`,
+          cleanupError,
+        );
+      }
     }
 
     return res.status(200).json({
-      message: "Product deleted successfully",
+      message: imageCleanupFailed
+        ? "Product deleted, but some Cloudinary images could not be cleaned up"
+        : "Product deleted successfully",
       product,
-      imageCleanupFailed: cleanupFailed,
+      imageCleanupFailed,
     });
   } catch (error) {
     console.error("Error deleting product:", error);

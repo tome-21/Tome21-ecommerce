@@ -2,7 +2,7 @@ import { query } from "../config/db.js";
 
 export const getAllCategories = async () => {
   const result = await query(`
-    SELECT id, name, image_url
+    SELECT *
     FROM categories
     ORDER BY created_at DESC
   `);
@@ -13,7 +13,7 @@ export const getAllCategories = async () => {
 export const getCategoryById = async (id) => {
   const result = await query(
     `
-      SELECT id, name, image_url
+      SELECT *
       FROM categories
       WHERE id = $1
     `,

@@ -1,5 +1,5 @@
 import cloudinary from "../config/cloudinary.js";
-import uploadImage from "../services/cloudinaryService.js";
+import { uploadImage } from "../services/cloudinaryService.js";
 
 import {
   getImagesByProductId,
@@ -8,12 +8,6 @@ import {
   updateProductImage,
   deleteProductImage,
 } from "../models/productImageModel.js";
-
-const hidePublicId = (image) => {
-  if (!image) return image;
-  const { public_id, ...imageData } = image;
-  return imageData;
-};
 
 // GET /product-images/product/:productId
 export const getProductImages = async (req, res) => {
@@ -204,21 +198,17 @@ export const deleteProductImageController = async (req, res) => {
     const image = await deleteProductImage(req.params.id);
 
     if (!image) {
-      return res.status(404).json({ error: "Product image not found" });
+      return res.status(404).json({
+        error: "Product image not found",
+      });
     }
 
     let imageCleanupFailed = false;
 
+    // Delete the image from Cloudinary.
     if (image.public_id) {
       try {
-        const result = await cloudinary.uploader.destroy(image.public_id, {
-          resource_type: "image",
-        });
-
-        if (result.result !== "ok" && result.result !== "not found") {
-          imageCleanupFailed = true;
-          console.error("Cloudinary product image cleanup failed:", result);
-        }
+        await deleteCloudinaryImage(image.public_id);
       } catch (cleanupError) {
         imageCleanupFailed = true;
         console.error("Cloudinary product image cleanup failed:", cleanupError);
@@ -229,11 +219,14 @@ export const deleteProductImageController = async (req, res) => {
       message: imageCleanupFailed
         ? "Product image deleted, but Cloudinary cleanup failed"
         : "Product image deleted successfully",
-      data: hidePublicId(image),
+      data: image,
       imageCleanupFailed,
     });
   } catch (error) {
     console.error("Error deleting product image:", error);
-    return res.status(500).json({ error: "Failed to delete product image" });
+
+    return res.status(500).json({
+      error: "Failed to delete product image",
+    });
   }
 };

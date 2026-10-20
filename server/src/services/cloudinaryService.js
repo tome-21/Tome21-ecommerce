@@ -1,6 +1,6 @@
 import cloudinary from "../config/cloudinary.js";
 
-const uploadImage = (fileBuffer, folder) => {
+export const uploadImage = (fileBuffer, folder) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
@@ -23,4 +23,21 @@ const uploadImage = (fileBuffer, folder) => {
   });
 };
 
-export default uploadImage;
+export const deleteCloudinaryImage = async (publicId) => {
+  if (!publicId) {
+    console.log("No Cloudinary public_id provided");
+    return;
+  }
+
+  const result = await cloudinary.uploader.destroy(publicId, {
+    resource_type: "image",
+  });
+
+  console.log("Cloudinary deletion result:", result);
+
+  if (result.result !== "ok" && result.result !== "not found") {
+    throw new Error(`Cloudinary deletion failed: ${result.result}`);
+  }
+
+  return result;
+};

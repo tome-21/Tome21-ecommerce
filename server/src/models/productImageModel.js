@@ -3,7 +3,7 @@ import { query } from "../config/db.js";
 export const getImagesByProductId = async (productId) => {
   const result = await query(
     `
-      SELECT id, product_id, image_url, sort_order 
+      SELECT * 
       FROM product_images
       WHERE product_id = $1
       ORDER BY sort_order ASC, id ASC
@@ -17,7 +17,7 @@ export const getImagesByProductId = async (productId) => {
 export const getImageById = async (id) => {
   const result = await query(
     `
-      SELECT id, product_id, image_url, sort_order
+      SELECT *
       FROM product_images
       WHERE id = $1
     `,
