@@ -37,8 +37,8 @@ export const createProductImage = async (
     `
       INSERT INTO product_images (
         product_id,
-        public_id,
         image_url,
+        public_id,
         sort_order
       )
       VALUES ($1, $2, $3, $4)

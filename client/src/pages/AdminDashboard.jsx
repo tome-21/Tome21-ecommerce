@@ -1,6 +1,6 @@
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import ProductsManager from "../components/admin/ProductsManager";
+import ProductsManager from "../components/admin/productsManager/ProductsManager";
 import CategoriesManager from "../components/admin/CategoriesManager";
 import OrdersManager from "../components/admin/OrdersManager";
 

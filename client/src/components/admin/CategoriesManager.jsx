@@ -103,15 +103,26 @@ export default function CategoriesManager() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+
     setDeleting(true);
+
     try {
-      await axios.delete(`${apiEndpoint}/categories/${deleteTarget.id}`, {
-        withCredentials: true,
-      });
+      const { data } = await axios.delete(
+        `${apiEndpoint}/categories/${deleteTarget.id}`,
+        { withCredentials: true },
+      );
+
       setCategories((prev) =>
         prev.filter((c) => String(c.id) !== String(deleteTarget.id)),
       );
-      notify(`"${deleteTarget.name}" deleted`);
+
+      notify(
+        data.imageCleanupFailed
+          ? `"${deleteTarget.name}" deleted, but its image cleanup failed`
+          : `"${deleteTarget.name}" deleted`,
+        data.imageCleanupFailed ? "error" : undefined,
+      );
+
       setDeleteTarget(null);
     } catch (err) {
       notify(getErrorMessage(err, "Failed to delete category"), "error");

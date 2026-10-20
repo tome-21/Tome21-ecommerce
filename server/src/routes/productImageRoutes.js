@@ -1,4 +1,7 @@
+
 import express from "express";
+import upload from "../middleware/uploadMiddleware.js";
+import { requireAdmin } from "../middleware/authMiddleware.js";
 
 import {
   getProductImages,
@@ -7,8 +10,6 @@ import {
   updateProductImageController,
   deleteProductImageController,
 } from "../controllers/productImageController.js";
-import { requireAdmin } from "../middleware/authMiddleware.js";
-import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 

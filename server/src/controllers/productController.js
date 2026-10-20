@@ -6,6 +6,8 @@ import {
   getTopProducts,
   getProducts,
 } from "../models/productModel.js";
+import cloudinary from "../config/cloudinary.js";
+import { getImagesByProductId } from "../models/productImageModel.js";
 
 export const getFeaturedProducts = async (req, res) => {
   try {
@@ -140,6 +142,10 @@ export const deleteProductController = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // 1. Save image IDs before the database cascade deletes their records.
+    const images = await getImagesByProductId(id);
+
+    // 2. Delete the product from PostgreSQL.
     const product = await deleteProduct(id);
 
     if (!product) {
@@ -148,14 +154,39 @@ export const deleteProductController = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    // 3. Delete its images from Cloudinary.
+    const results = await Promise.allSettled(
+      images
+        .filter((image) => image.public_id)
+        .map((image) =>
+          cloudinary.uploader.destroy(image.public_id, {
+            resource_type: "image",
+          }),
+        ),
+    );
+
+    // 4. Detect cleanup failures without undoing product deletion.
+    const cleanupFailed = results.some(
+      (result) =>
+        result.status === "rejected" ||
+        !["ok", "not found"].includes(result.value?.result),
+    );
+
+    if (cleanupFailed) {
+      console.error(
+        `Cloudinary cleanup failed for product ${id}. Some images may remain.`,
+      );
+    }
+
+    return res.status(200).json({
       message: "Product deleted successfully",
       product,
+      imageCleanupFailed: cleanupFailed,
     });
   } catch (error) {
     console.error("Error deleting product:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to delete product",
     });
   }

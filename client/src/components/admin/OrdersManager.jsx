@@ -200,21 +200,6 @@ export default function OrdersManager() {
     );
   }, []);
 
-  const quickAdvance = async (order) => {
-    const next = NEXT_STATUS[normStatus(order.status)];
-    if (!next) return;
-    setQuickId(order.id);
-    try {
-      const updated = await putStatus(order.id, next);
-      applyStatus(order.id, updated?.status ?? next, updated?.updated_at);
-      notify(`Order #${order.id} marked as ${next}`);
-    } catch (err) {
-      notify(getErrorMessage(err, "Failed to update status"), "error");
-    } finally {
-      setQuickId(null);
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -376,19 +361,6 @@ export default function OrdersManager() {
                           <StatusBadge status={order.status} />
                         </td>
                         <td className="px-6 py-3 text-right">
-                          {next && (
-                            <button
-                              type="button"
-                              onClick={() => quickAdvance(order)}
-                              disabled={quickId === order.id}
-                              className="mr-2 inline-flex items-center gap-1.5 rounded-lg border border-[#3e9d24]/30 px-2.5 py-1 text-xs font-semibold text-[#2f7d1b] transition-colors hover:bg-green-50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24]"
-                            >
-                              {quickId === order.id && (
-                                <Spinner className="h-3 w-3" />
-                              )}
-                              Mark {next}
-                            </button>
-                          )}
                           <button
                             type="button"
                             onClick={() => setSelectedId(order.id)}

@@ -178,6 +178,7 @@ export const deleteCategoryController = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Delete the category from PostgreSQL first.
     const category = await deleteCategory(id);
 
     if (!category) {
@@ -186,14 +187,46 @@ export const deleteCategoryController = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      message: "Category deleted successfully",
-      category,
+    let imageCleanupFailed = false;
+
+    // Delete the corresponding image from Cloudinary.
+    if (category.public_id) {
+      try {
+        const result = await cloudinary.uploader.destroy(category.public_id, {
+          resource_type: "image",
+        });
+
+        if (!["ok", "not found"].includes(result.result)) {
+          imageCleanupFailed = true;
+          console.error("Cloudinary category image cleanup failed:", result);
+        }
+      } catch (error) {
+        imageCleanupFailed = true;
+        console.error("Cloudinary category image cleanup failed:", error);
+      }
+    }
+
+    const { public_id, ...categoryData } = category;
+
+    return res.status(200).json({
+      message: imageCleanupFailed
+        ? "Category deleted, but image cleanup failed"
+        : "Category deleted successfully",
+      data: categoryData,
+      imageCleanupFailed,
     });
   } catch (error) {
     console.error("Error deleting category:", error);
 
-    res.status(500).json({
+    // PostgreSQL foreign-key violations, for example.
+    if (error.code === "23503") {
+      return res.status(409).json({
+        error:
+          "Cannot delete this category because it is referenced by other records.",
+      });
+    }
+
+    return res.status(500).json({
       error: "Failed to delete category",
     });
   }
