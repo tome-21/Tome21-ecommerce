@@ -5,7 +5,6 @@ import {
   updateCategory,
   deleteCategory,
 } from "../models/catagoryModel.js";
-import cloudinary from "../config/cloudinary.js";
 import {
   uploadImage,
   deleteCloudinaryImage,
@@ -104,6 +103,7 @@ export const createCategoryController = async (req, res) => {
 };
 export const updateCategoryController = async (req, res) => {
   let uploadedImage;
+  let databaseUpdated = false;
 
   try {
     const { id } = req.params;
@@ -126,6 +126,7 @@ export const updateCategoryController = async (req, res) => {
     let image_url = currentCategory.image_url;
     let public_id = currentCategory.public_id;
 
+    // Upload the new image if one was provided.
     if (req.file) {
       uploadedImage = await uploadImage(req.file.buffer, "categories");
 
@@ -133,16 +134,19 @@ export const updateCategoryController = async (req, res) => {
       public_id = uploadedImage.public_id;
     }
 
+    // Update the category in PostgreSQL.
     const category = await updateCategory(id, name, image_url, public_id);
 
-    // The database update succeeded. Now clean up the old image.
+    databaseUpdated = true;
+
+    // Delete the old image only after the database update succeeds.
     if (
       uploadedImage &&
       currentCategory.public_id &&
       currentCategory.public_id !== uploadedImage.public_id
     ) {
       try {
-        await cloudinary.uploader.destroy(currentCategory.public_id);
+        await deleteCloudinaryImage(currentCategory.public_id);
       } catch (cleanupError) {
         console.error("Old category image cleanup failed:", cleanupError);
       }
@@ -155,9 +159,10 @@ export const updateCategoryController = async (req, res) => {
       data: categoryData,
     });
   } catch (error) {
-    if (uploadedImage?.public_id) {
+    // Delete the new image only if the database update did not succeed.
+    if (uploadedImage?.public_id && !databaseUpdated) {
       try {
-        await cloudinary.uploader.destroy(uploadedImage.public_id);
+        await deleteCloudinaryImage(uploadedImage.public_id);
       } catch (cleanupError) {
         console.error("New category image cleanup failed:", cleanupError);
       }

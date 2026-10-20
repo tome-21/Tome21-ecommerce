@@ -1,5 +1,7 @@
-import cloudinary from "../config/cloudinary.js";
-import { uploadImage } from "../services/cloudinaryService.js";
+import {
+  uploadImage,
+  deleteCloudinaryImage,
+} from "../services/cloudinaryService.js";
 
 import {
   getImagesByProductId,
@@ -14,10 +16,13 @@ export const getProductImages = async (req, res) => {
   try {
     const images = await getImagesByProductId(req.params.productId);
 
-    return res.status(200).json(images.map(hidePublicId));
+    return res.status(200).json(images);
   } catch (error) {
     console.error("Error getting product images:", error);
-    return res.status(500).json({ error: "Failed to get product images" });
+
+    return res.status(500).json({
+      error: "Failed to get product images",
+    });
   }
 };
 
@@ -27,26 +32,34 @@ export const getProductImage = async (req, res) => {
     const image = await getImageById(req.params.id);
 
     if (!image) {
-      return res.status(404).json({ error: "Product image not found" });
+      return res.status(404).json({
+        error: "Product image not found",
+      });
     }
 
-    return res.status(200).json(hidePublicId(image));
+    return res.status(200).json(image);
   } catch (error) {
     console.error("Error getting product image:", error);
-    return res.status(500).json({ error: "Failed to get product image" });
+
+    return res.status(500).json({
+      error: "Failed to get product image",
+    });
   }
 };
 
 // POST /product-images/product/:productId
 export const createProductImageController = async (req, res) => {
   let uploadedImage;
+  let databaseCreated = false;
 
   try {
     const { productId } = req.params;
     const sortOrder = Number(req.body.sort_order ?? 0);
 
     if (!req.file) {
-      return res.status(400).json({ error: "Please select an image" });
+      return res.status(400).json({
+        error: "Please select an image",
+      });
     }
 
     if (!Number.isInteger(sortOrder) || sortOrder < 0) {
@@ -64,17 +77,17 @@ export const createProductImageController = async (req, res) => {
       sortOrder,
     );
 
+    databaseCreated = true;
+
     return res.status(201).json({
       message: "Product image uploaded successfully",
-      data: hidePublicId(image),
+      data: image,
     });
   } catch (error) {
-    // If the database insert fails, clean up the newly uploaded image.
-    if (uploadedImage?.public_id) {
+    // Clean up the uploaded image if the database insert failed.
+    if (uploadedImage?.public_id && !databaseCreated) {
       try {
-        await cloudinary.uploader.destroy(uploadedImage.public_id, {
-          resource_type: "image",
-        });
+        await deleteCloudinaryImage(uploadedImage.public_id);
       } catch (cleanupError) {
         console.error("Cloudinary cleanup failed:", cleanupError);
       }
@@ -83,23 +96,30 @@ export const createProductImageController = async (req, res) => {
     console.error("Error creating product image:", error);
 
     if (error.code === "23503") {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({
+        error: "Product not found",
+      });
     }
 
-    return res.status(500).json({ error: "Failed to upload product image" });
+    return res.status(500).json({
+      error: "Failed to upload product image",
+    });
   }
 };
 
 // PUT /product-images/:id
 export const updateProductImageController = async (req, res) => {
   let uploadedImage;
+  let databaseUpdated = false;
 
   try {
     const { id } = req.params;
     const currentImage = await getImageById(id);
 
     if (!currentImage) {
-      return res.status(404).json({ error: "Product image not found" });
+      return res.status(404).json({
+        error: "Product image not found",
+      });
     }
 
     const sortOrder =
@@ -113,7 +133,7 @@ export const updateProductImageController = async (req, res) => {
       });
     }
 
-    // Upload a replacement only if the request contains a new file.
+    // Upload a replacement only if a new file was provided.
     if (req.file) {
       uploadedImage = await uploadImage(req.file.buffer, "products");
     }
@@ -129,17 +149,14 @@ export const updateProductImageController = async (req, res) => {
     );
 
     if (!updatedImage) {
-      // Unlikely, but clean up the new asset if the row disappeared.
-      if (uploadedImage?.public_id) {
-        await cloudinary.uploader.destroy(uploadedImage.public_id, {
-          resource_type: "image",
-        });
-      }
-
-      return res.status(404).json({ error: "Product image not found" });
+      return res.status(404).json({
+        error: "Product image not found",
+      });
     }
 
-    // Delete the old Cloudinary image only after the database update succeeds.
+    databaseUpdated = true;
+
+    // Delete the old image only after the database update succeeds.
     let imageCleanupFailed = false;
 
     if (
@@ -148,17 +165,10 @@ export const updateProductImageController = async (req, res) => {
       currentImage.public_id !== uploadedImage.public_id
     ) {
       try {
-        const result = await cloudinary.uploader.destroy(
-          currentImage.public_id,
-          { resource_type: "image" },
-        );
-
-        if (result.result !== "ok" && result.result !== "not found") {
-          imageCleanupFailed = true;
-          console.error("Old product image cleanup failed:", result);
-        }
+        await deleteCloudinaryImage(currentImage.public_id);
       } catch (cleanupError) {
         imageCleanupFailed = true;
+
         console.error("Old product image cleanup failed:", cleanupError);
       }
     }
@@ -167,28 +177,24 @@ export const updateProductImageController = async (req, res) => {
       message: imageCleanupFailed
         ? "Product image updated, but old image cleanup failed"
         : "Product image updated successfully",
-      data: hidePublicId(updatedImage),
+      data: updatedImage,
       imageCleanupFailed,
     });
   } catch (error) {
-    // Only delete the new upload if the update failed before succeeding.
-    if (uploadedImage?.public_id) {
+    // Only remove the new upload if the database update did not succeed.
+    if (uploadedImage?.public_id && !databaseUpdated) {
       try {
-        const currentImage = await getImageById(req.params.id);
-
-        // If the DB now points at this upload, do not delete it.
-        if (currentImage?.public_id !== uploadedImage.public_id) {
-          await cloudinary.uploader.destroy(uploadedImage.public_id, {
-            resource_type: "image",
-          });
-        }
+        await deleteCloudinaryImage(uploadedImage.public_id);
       } catch (cleanupError) {
         console.error("New product image cleanup failed:", cleanupError);
       }
     }
 
     console.error("Error updating product image:", error);
-    return res.status(500).json({ error: "Failed to update product image" });
+
+    return res.status(500).json({
+      error: "Failed to update product image",
+    });
   }
 };
 
@@ -205,12 +211,13 @@ export const deleteProductImageController = async (req, res) => {
 
     let imageCleanupFailed = false;
 
-    // Delete the image from Cloudinary.
+    // Delete the corresponding Cloudinary image.
     if (image.public_id) {
       try {
         await deleteCloudinaryImage(image.public_id);
       } catch (cleanupError) {
         imageCleanupFailed = true;
+
         console.error("Cloudinary product image cleanup failed:", cleanupError);
       }
     }
