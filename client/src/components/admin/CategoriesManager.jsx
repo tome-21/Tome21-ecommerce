@@ -277,36 +277,83 @@ export default function CategoriesManager() {
 
 function CategoryFormModal({ category, onClose, onSuccess }) {
   const isEdit = Boolean(category);
+
   const [name, setName] = useState(category?.name || "");
-  const [imageUrl, setImageUrl] = useState(category?.image_url || "");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(category?.image_url || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // Clean up temporary preview URLs created by the browser.
+  useEffect(() => {
+    return () => {
+      if (previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image must be 5 MB or smaller.");
+      e.target.value = "";
+      return;
+    }
+
+    setError("");
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const trimmedName = name.trim();
+
     if (!trimmedName) {
-      setError("Category name is required");
+      setError("Category name is required.");
+      return;
+    }
+
+    if (!isEdit && !selectedFile) {
+      setError("Please select a category image.");
       return;
     }
 
     setSaving(true);
     setError("");
-    const payload = { name: trimmedName, image_url: imageUrl.trim() };
+
+    const formData = new FormData();
+    formData.append("name", trimmedName);
+
+    if (selectedFile) {
+      formData.append("image", selectedFile);
+    }
 
     try {
       if (isEdit) {
-        await axios.put(`${apiEndpoint}/categories/${category.id}`, payload, {
+        await axios.put(`${apiEndpoint}/categories/${category.id}`, formData, {
           withCredentials: true,
         });
       } else {
-        await axios.post(`${apiEndpoint}/categories`, payload, {
+        await axios.post(`${apiEndpoint}/categories`, formData, {
           withCredentials: true,
         });
       }
+
       onSuccess(isEdit);
     } catch (err) {
       setError(getErrorMessage(err, "Error saving category"));
+    } finally {
       setSaving(false);
     }
   };
@@ -318,22 +365,53 @@ function CategoryFormModal({ category, onClose, onSuccess }) {
       busy={saving}
     >
       <form onSubmit={handleSubmit} className="space-y-4 p-6" noValidate>
-        {/* key resets the broken-image state whenever the URL changes */}
-        {imageUrl.trim() && (
-          <div className="flex justify-center">
-            <Thumb
-              key={imageUrl}
-              url={imageUrl.trim()}
-              name={name}
-              className="h-16 w-16"
+        {/* Image preview */}
+        <div className="flex flex-col items-center gap-3">
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt="Category preview"
+              className="h-28 w-28 rounded-xl border border-slate-200 bg-white object-cover"
             />
-          </div>
-        )}
+          ) : (
+            <div className="flex h-28 w-28 items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-slate-400">
+              No image
+            </div>
+          )}
 
+          <div className="w-full">
+            <label htmlFor="category-image" className={labelClass}>
+              Category image
+              {!isEdit && (
+                <span className="font-normal normal-case"> (required)</span>
+              )}
+            </label>
+
+            <input
+              id="category-image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              disabled={saving}
+              className={`${inputClass} file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold`}
+            />
+
+            <p className="mt-1 text-xs text-slate-500">
+              {selectedFile
+                ? selectedFile.name
+                : isEdit
+                  ? "Choose a new image only if you want to replace the current one."
+                  : "Choose an image up to 5 MB."}
+            </p>
+          </div>
+        </div>
+
+        {/* Category name */}
         <div>
           <label htmlFor="category-name" className={labelClass}>
             Category name
           </label>
+
           <input
             id="category-name"
             autoFocus
@@ -341,23 +419,9 @@ function CategoryFormModal({ category, onClose, onSuccess }) {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            disabled={saving}
             className={inputClass}
             placeholder="e.g. Electronics"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="category-image" className={labelClass}>
-            Image URL{" "}
-            <span className="font-normal normal-case">(optional)</span>
-          </label>
-          <input
-            id="category-image"
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className={inputClass}
-            placeholder="https://example.com/image.jpg"
           />
         </div>
 
@@ -376,6 +440,7 @@ function CategoryFormModal({ category, onClose, onSuccess }) {
           >
             Cancel
           </button>
+
           <button type="submit" disabled={saving} className={btnPrimary}>
             {saving && <Spinner />}
             {saving ? "Saving…" : isEdit ? "Save changes" : "Create category"}

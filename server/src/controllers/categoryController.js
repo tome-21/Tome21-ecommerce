@@ -5,6 +5,8 @@ import {
   updateCategory,
   deleteCategory,
 } from "../models/catagoryModel.js";
+import cloudinary from "../config/cloudinary.js";
+import uploadImage from "../services/cloudinaryService.js";
 
 export const getCategories = async (req, res) => {
   try {
@@ -43,51 +45,132 @@ export const getCategory = async (req, res) => {
 };
 
 export const createCategoryController = async (req, res) => {
+  let uploadedImage;
+
   try {
-    const { name, image_url } = req.body;
-    if (!name?.trim() || !image_url?.trim()) {
-      return res
-        .status(400)
-        .json({ error: "Category name and image URL are required" });
+    const name = req.body.name?.trim();
+
+    if (!name) {
+      return res.status(400).json({
+        error: "Category name is required",
+      });
     }
-    const category = await createCategory(name.trim(), image_url.trim());
-    return res
-      .status(201)
-      .json({ message: "Category created successfully", data: category });
+
+    if (!req.file) {
+      return res.status(400).json({
+        error: "Category image is required",
+      });
+    }
+
+    uploadedImage = await uploadImage(req.file.buffer, "categories");
+
+    const category = await createCategory(
+      name,
+      uploadedImage.image_url,
+      uploadedImage.public_id,
+    );
+
+    const { public_id, ...categoryData } = category;
+
+    return res.status(201).json({
+      message: "Category created successfully",
+      data: categoryData,
+    });
   } catch (error) {
-    console.error("Error creating category:", error);
-    if (error.code === "23505") {
-      return res
-        .status(409)
-        .json({ error: "A category with this name already exists" });
+    // Clean up an uploaded image if saving the category failed.
+    if (uploadedImage?.public_id) {
+      try {
+        await cloudinary.uploader.destroy(uploadedImage.public_id);
+      } catch (cleanupError) {
+        console.error("Cloudinary cleanup failed:", cleanupError);
+      }
     }
-    return res.status(500).json({ error: "Failed to create category" });
+
+    console.error("Error creating category:", error);
+
+    if (error.code === "23505") {
+      return res.status(409).json({
+        error: "A category with this name already exists",
+      });
+    }
+
+    return res.status(500).json({
+      error: "Failed to create category",
+    });
   }
 };
 export const updateCategoryController = async (req, res) => {
+  let uploadedImage;
+
   try {
     const { id } = req.params;
-    const { name, image_url } = req.body;
-    if (!name?.trim() || !image_url?.trim()) {
-      return res
-        .status(400)
-        .json({ error: "Category name and image URL are required" });
+    const currentCategory = await getCategoryById(id);
+
+    if (!currentCategory) {
+      return res.status(404).json({
+        error: "Category not found",
+      });
     }
-    const category = await updateCategory(id, name.trim(), image_url.trim());
-    if (!category) {
-      return res.status(404).json({ error: "Category not found" });
+
+    const name = req.body.name?.trim() || currentCategory.name;
+
+    if (!req.body.name?.trim() && !req.file) {
+      return res.status(400).json({
+        error: "Provide a category name or a new image",
+      });
     }
-    return res
-      .status(200)
-      .json({ message: "Category updated successfully", data: category });
+
+    let image_url = currentCategory.image_url;
+    let public_id = currentCategory.public_id;
+
+    if (req.file) {
+      uploadedImage = await uploadImage(req.file.buffer, "categories");
+
+      image_url = uploadedImage.image_url;
+      public_id = uploadedImage.public_id;
+    }
+
+    const category = await updateCategory(id, name, image_url, public_id);
+
+    // The database update succeeded. Now clean up the old image.
+    if (
+      uploadedImage &&
+      currentCategory.public_id &&
+      currentCategory.public_id !== uploadedImage.public_id
+    ) {
+      try {
+        await cloudinary.uploader.destroy(currentCategory.public_id);
+      } catch (cleanupError) {
+        console.error("Old category image cleanup failed:", cleanupError);
+      }
+    }
+
+    const { public_id: savedPublicId, ...categoryData } = category;
+
+    return res.status(200).json({
+      message: "Category updated successfully",
+      data: categoryData,
+    });
   } catch (error) {
-    console.error("Error updating category:", error);
-    if (error.code === "23505") {
-      return res
-        .status(409)
-        .json({ error: "A category with this name already exists" });
+    if (uploadedImage?.public_id) {
+      try {
+        await cloudinary.uploader.destroy(uploadedImage.public_id);
+      } catch (cleanupError) {
+        console.error("New category image cleanup failed:", cleanupError);
+      }
     }
-    return res.status(500).json({ error: "Failed to update category" });
+
+    console.error("Error updating category:", error);
+
+    if (error.code === "23505") {
+      return res.status(409).json({
+        error: "A category with this name already exists",
+      });
+    }
+
+    return res.status(500).json({
+      error: "Failed to update category",
+    });
   }
 };
 

@@ -20,10 +20,10 @@ import authRoutes from "./routes/authRoutes.js";
 // admin
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 
-// CRITICAL FIX: CORS must allow credentials (cookies/sessions) and your frontend origin
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // Change if your frontend runs elsewhere
+    origin: process.env.CLIENT_URL,
     credentials: true,
   }),
 );

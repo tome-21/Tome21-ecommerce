@@ -103,13 +103,15 @@ itself
 
 ## catagories
 
-### Create product
+### Create catagory
 
 POST /catagories
 
 body:
 {
-"name": "Electronics"
+"name": "Electronics",
+"public_id": "..........",
+"image_url": "............",
 }
 
 ### Get all catagories
@@ -122,6 +124,7 @@ response:
 {
 "id": "2",
 "name": "Electronics",
+"image_url": ".............."
 "created_at": "2026-10-04T13:16:31.427Z"
 }
 ]
@@ -135,6 +138,7 @@ response:
 {
 "id": "2",
 "name": "Electronics",
+"image_url": "..............",
 "created_at": "2026-10-04T13:16:31.427Z"
 }
 
@@ -144,8 +148,9 @@ PUT /categories/1 (:id)
 
 Body:
 {
-"name": "Running Shoes"
-
+"name": "Running Shoes",
+"public_id": "..........",
+"image_url": ".............."
 }
 
 Response: {id + itself}
@@ -169,6 +174,7 @@ POST /product-images/product/1
 
 Body:
 {
+"public_id": "tome21/products/product_45/abc123",
 "image_url": "https://example.com/nike-front.jpg",
 "sort_order": 0
 }
@@ -178,6 +184,7 @@ Response:
 {
 "id": "1",
 "product_id": "1",
+"public_id": "tome21/products/product_45/abc123"
 "image_url": "https://example.com/nike-front.jpg",
 "sort_order": 0
 }
@@ -205,6 +212,7 @@ res :
 "id": "1",
 "product_id": "1",
 "image_url": "https://example.com/nike-side.jpg",
+
 "sort_order": 3
 }
 
@@ -214,6 +222,7 @@ PUT /product-images/1
 
 Body:
 {
+"public_id": "tome21/products/product_45/abc123",
 "image_url": "https://example.com/nike-new.jpg",
 "sort_order": 0
 }
@@ -223,6 +232,7 @@ res:
 {
 "id": "1",
 "product_id": "1",
+"public_id": "tome21/products/product_45/abc123",
 "image_url": "https://example.com/nike-side.jpg",
 "sort_order": 3
 }
@@ -237,6 +247,7 @@ res:
 "image": {
 "id": "2",
 "product_id": "1",
+"public_id": "tome21/products/product_45/abc123",
 "image_url": "https://example.com/nike-side.jpg",
 "sort_order": 1
 }

@@ -8,14 +8,26 @@ import {
   updateCategoryController,
   deleteCategoryController,
 } from "../controllers/categoryController.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
 router.get("/", getCategories);
 router.get("/:id", getCategory);
+router.post(
+  "/",
+  requireAdmin,
+  upload.single("image"),
+  createCategoryController,
+);
 
-router.post("/", requireAdmin, createCategoryController);
-router.put("/:id", requireAdmin, updateCategoryController);
+router.put(
+  "/:id",
+  requireAdmin,
+  upload.single("image"),
+  updateCategoryController,
+);
+
 router.delete("/:id", requireAdmin, deleteCategoryController);
 
 export default router;

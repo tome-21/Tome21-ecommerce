@@ -23,6 +23,7 @@ CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     image_url TEXT NOT NULL,
+    public_id TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -63,6 +64,7 @@ CREATE TABLE product_images (
     product_id BIGINT NOT NULL
         REFERENCES products(id)
         ON DELETE CASCADE,
+    public_id TEXT NOT NULL,
 
     image_url TEXT NOT NULL,
 

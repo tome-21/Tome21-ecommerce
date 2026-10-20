@@ -2,7 +2,7 @@ import { query } from "../config/db.js";
 
 export const getAllCategories = async () => {
   const result = await query(`
-    SELECT *
+    SELECT id, name, image_url
     FROM categories
     ORDER BY created_at DESC
   `);
@@ -13,7 +13,7 @@ export const getAllCategories = async () => {
 export const getCategoryById = async (id) => {
   const result = await query(
     `
-      SELECT *
+      SELECT id, name, image_url
       FROM categories
       WHERE id = $1
     `,
@@ -23,19 +23,27 @@ export const getCategoryById = async (id) => {
   return result.rows[0];
 };
 
-export const createCategory = async (name, image_url) => {
+export const createCategory = async (name, image_url, public_id) => {
   const result = await query(
-    ` INSERT INTO categories (name, image_url) VALUES ($1, $2) RETURNING * `,
-    [name, image_url],
+    ` INSERT INTO categories (name, image_url, public_id) VALUES ($1, $2, $3) RETURNING * `,
+    [name, image_url, public_id],
   );
   return result.rows[0];
 };
 
-export const updateCategory = async (id, name, image_url) => {
+export const updateCategory = async (id, name, image_url, public_id) => {
   const result = await query(
-    ` UPDATE categories SET name = $1, image_url = $2 WHERE id = $3 RETURNING * `,
-    [name, image_url, id],
+    `
+      UPDATE categories
+      SET name = $1,
+          image_url = $2,
+          public_id = $3
+      WHERE id = $4
+      RETURNING *
+    `,
+    [name, image_url, public_id, id],
   );
+
   return result.rows[0] ?? null;
 };
 
