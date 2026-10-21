@@ -20,7 +20,6 @@ import authRoutes from "./routes/authRoutes.js";
 // admin
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
