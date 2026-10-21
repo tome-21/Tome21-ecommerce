@@ -8,7 +8,7 @@ import ProductCard from "../components/ProductCard";
 const apiEndpoint = import.meta.env.VITE_API_URL;
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
 
 const CONDITION_LABELS = { new: "Brand new", used: "Used or refurbished" };
 
@@ -142,7 +142,7 @@ function Gallery({ images, name }) {
               aria-current={i === index}
               className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-lg overflow-hidden bg-white border-2 transition-colors ${focusRing} ${
                 i === index
-                  ? "border-[#3e9d24]"
+                  ? "border-[#e11d2e]"
                   : "border-gray-200 hover:border-gray-400"
               }`}
             >
@@ -319,7 +319,7 @@ export default function ProductDetails() {
               <button
                 type="button"
                 onClick={() => setReloadKey((k) => k + 1)}
-                className={`bg-[#3e9d24] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#2f7d1b] ${focusRing}`}
+                className={`bg-[#e11d2e] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b5121f] ${focusRing}`}
               >
                 Try again
               </button>
@@ -351,7 +351,7 @@ export default function ProductDetails() {
         <nav aria-label="Breadcrumb" className="mb-4 text-sm text-gray-500">
           <ol className="flex items-center gap-2 min-w-0">
             <li className="shrink-0">
-              <Link to="/" className="hover:text-[#2f7d1b] hover:underline">
+              <Link to="/" className="hover:text-[#e11d2e] hover:underline">
                 Home
               </Link>
             </li>
@@ -359,7 +359,7 @@ export default function ProductDetails() {
             <li className="shrink-0">
               <Link
                 to={categoryLink}
-                className="hover:text-[#2f7d1b] hover:underline"
+                className="hover:text-[#e11d2e] hover:underline"
               >
                 {product.category_name || "Products"}
               </Link>
@@ -382,7 +382,7 @@ export default function ProductDetails() {
             {product.category_name && (
               <Link
                 to={categoryLink}
-                className="text-sm font-medium text-[#2f7d1b] hover:underline"
+                className="text-sm font-medium text-[#e11d2e] hover:underline"
               >
                 {product.category_name}
               </Link>
@@ -392,7 +392,7 @@ export default function ProductDetails() {
               {product.name}
             </h1>
 
-            <p className="mt-4 text-3xl font-extrabold text-[#2f7d1b]">
+            <p className="mt-4 text-3xl font-extrabold text-[#e11d2e]">
               <span className="text-lg font-semibold mr-1.5">ETB</span>
               {formatPrice(product.price)}
             </p>
@@ -404,7 +404,7 @@ export default function ProductDetails() {
                   ? "text-red-600"
                   : lowStock
                     ? "text-amber-600"
-                    : "text-[#2f7d1b]"
+                    : "text-gray-700"
               }`}
             >
               {outOfStock
@@ -472,14 +472,14 @@ export default function ProductDetails() {
             {addedQty > 0 && (
               <div
                 role="status"
-                className="mt-4 flex items-center justify-between gap-3 text-sm bg-green-50 border border-green-200 text-[#1f4d14] rounded-lg px-3 py-2"
+                className="mt-4 flex items-center justify-between gap-3 text-sm bg-gray-50 border border-gray-200 text-gray-800 rounded-lg px-3 py-2"
               >
                 <span className="font-medium">
                   Added {addedQty} to your cart
                 </span>
                 <Link
                   to="/cart"
-                  className="font-bold underline whitespace-nowrap"
+                  className="font-bold text-[#e11d2e] underline whitespace-nowrap"
                 >
                   View cart
                 </Link>
@@ -495,7 +495,7 @@ export default function ProductDetails() {
                 className={`flex items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors ${focusRing} ${
                   outOfStock
                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-yellow-400 text-slate-900 hover:bg-yellow-300 disabled:opacity-60"
+                    : "bg-[#e11d2e] text-white hover:bg-[#b5121f] disabled:opacity-60"
                 }`}
               >
                 <CartIcon />
@@ -510,13 +510,13 @@ export default function ProductDetails() {
             {/* Reassurance */}
             <ul className="mt-6 pt-5 border-t border-gray-100 space-y-3 text-sm text-gray-600">
               <li className="flex items-center gap-3">
-                <Icon className="w-5 h-5 text-[#3e9d24] shrink-0">
+                <Icon className="w-5 h-5 text-gray-700 shrink-0">
                   <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7zM7 19a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4z" />
                 </Icon>
                 Delivered to you
               </li>
               <li className="flex items-center gap-3">
-                <Icon className="w-5 h-5 text-[#3e9d24] shrink-0">
+                <Icon className="w-5 h-5 text-gray-700 shrink-0">
                   <path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3zm-3 9l2 2 4-4" />
                 </Icon>
                 Secure checkout
@@ -584,7 +584,7 @@ export default function ProductDetails() {
       >
         <div className="min-w-0">
           <p className="text-xs text-gray-500">Price</p>
-          <p className="font-extrabold text-[#2f7d1b] leading-tight truncate">
+          <p className="font-extrabold text-[#e11d2e] leading-tight truncate">
             ETB {formatPrice(product.price)}
           </p>
         </div>
@@ -595,7 +595,7 @@ export default function ProductDetails() {
           className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-3 font-bold ${focusRing} ${
             outOfStock
               ? "bg-gray-100 text-gray-400"
-              : "bg-yellow-400 text-slate-900 active:bg-yellow-300 disabled:opacity-60"
+              : "bg-[#e11d2e] text-white active:bg-[#b5121f] disabled:opacity-60"
           }`}
         >
           <CartIcon />

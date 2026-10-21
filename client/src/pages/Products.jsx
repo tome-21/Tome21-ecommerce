@@ -22,7 +22,7 @@ const CONDITIONS = [
 ];
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
 
 const Icon = ({ children, className = "w-4 h-4" }) => (
   <svg
@@ -137,7 +137,7 @@ function SortDropdown({ value, onChange }) {
         aria-controls="sort-listbox"
         aria-activedescendant={open ? `sort-opt-${active}` : undefined}
         className={`w-full sm:w-56 flex items-center justify-between gap-2 border rounded-lg bg-white px-3 py-2 text-sm transition-colors ${focusRing} ${
-          open ? "border-[#3e9d24]" : "border-gray-300 hover:border-gray-400"
+          open ? "border-[#e11d2e]" : "border-gray-300 hover:border-gray-400"
         }`}
       >
         <span className="truncate">
@@ -171,14 +171,14 @@ function SortDropdown({ value, onChange }) {
                 onMouseEnter={() => setActive(i)}
                 onClick={() => choose(opt.value)}
                 className={`flex items-center justify-between gap-3 px-4 py-2.5 text-sm cursor-pointer ${
-                  i === active ? "bg-green-50" : ""
+                  i === active ? "bg-red-50" : ""
                 } ${
-                  isSelected ? "text-[#2f7d1b] font-semibold" : "text-gray-700"
+                  isSelected ? "text-[#e11d2e] font-semibold" : "text-gray-700"
                 }`}
               >
                 {opt.label}
                 {isSelected && (
-                  <Icon className="w-4 h-4 text-[#3e9d24]">
+                  <Icon className="w-4 h-4 text-[#e11d2e]">
                     <path d="M5 13l4 4L19 7" />
                   </Icon>
                 )}
@@ -209,7 +209,7 @@ function FilterPanel({
   idPrefix,
 }) {
   const inputClass =
-    "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3e9d24] focus:ring-1 focus:ring-[#3e9d24]";
+    "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#e11d2e] focus:ring-1 focus:ring-[#e11d2e]";
 
   return (
     <div className="divide-y divide-gray-100">
@@ -224,7 +224,7 @@ function FilterPanel({
               aria-pressed={category === ""}
               className={`w-full flex items-center gap-3 text-left px-3 py-2 rounded-lg text-sm transition-colors ${focusRing} ${
                 category === ""
-                  ? "bg-green-50 text-[#2f7d1b] font-semibold"
+                  ? "bg-red-50 text-[#e11d2e] font-semibold"
                   : "text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -249,7 +249,7 @@ function FilterPanel({
                   aria-pressed={active}
                   className={`w-full flex items-center gap-3 text-left px-3 py-2 rounded-lg text-sm transition-colors ${focusRing} ${
                     active
-                      ? "bg-green-50 text-[#2f7d1b] font-semibold"
+                      ? "bg-red-50 text-[#e11d2e] font-semibold"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
@@ -302,7 +302,7 @@ function FilterPanel({
           )}
           <button
             type="submit"
-            className={`mt-3 w-full border border-[#3e9d24] text-[#2f7d1b] font-semibold text-sm py-2 rounded-lg hover:bg-green-50 transition-colors ${focusRing}`}
+            className={`mt-3 w-full border border-[#e11d2e] text-[#e11d2e] font-semibold text-sm py-2 rounded-lg hover:bg-red-50 transition-colors ${focusRing}`}
           >
             Apply price
           </button>
@@ -323,7 +323,7 @@ function FilterPanel({
                 name={`${idPrefix}-condition`}
                 checked={condition === opt.value}
                 onChange={() => onCondition(opt.value)}
-                className="w-4 h-4 accent-[#3e9d24]"
+                className="w-4 h-4 accent-[#e11d2e]"
               />
               {opt.label}
             </label>
@@ -544,7 +544,7 @@ export default function Products() {
                   </Icon>
                   Filters
                   {chips.length > 0 && (
-                    <span className="bg-[#3e9d24] text-white text-xs rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
+                    <span className="bg-[#e11d2e] text-white text-xs rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
                       {chips.length}
                     </span>
                   )}
@@ -562,14 +562,14 @@ export default function Products() {
                 {chips.map((chip) => (
                   <span
                     key={chip.key}
-                    className="inline-flex items-center gap-1 bg-green-50 text-[#2f7d1b] text-xs font-semibold pl-3 pr-1.5 py-1 rounded-full"
+                    className="inline-flex items-center gap-1 bg-red-50 text-[#e11d2e] text-xs font-semibold pl-3 pr-1.5 py-1 rounded-full"
                   >
                     {chip.label}
                     <button
                       type="button"
                       onClick={() => updateParams(chip.clear)}
                       aria-label={`Remove filter: ${chip.label}`}
-                      className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-green-200/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24]"
+                      className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-200/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e]"
                     >
                       <Icon className="w-3 h-3">
                         <path d="M6 18L18 6M6 6l12 12" />
@@ -605,7 +605,7 @@ export default function Products() {
                     c.id === "" ? "px-4" : "pl-1 pr-4"
                   } ${
                     active
-                      ? "bg-[#3e9d24] border-[#3e9d24] text-white"
+                      ? "bg-[#e11d2e] border-[#e11d2e] text-white"
                       : "bg-white border-gray-300 text-gray-700"
                   }`}
                 >
@@ -626,7 +626,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setReloadKey((k) => k + 1)}
-                className={`self-start sm:self-auto bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-700 ${focusRing}`}
+                className={`self-start sm:self-auto bg-[#e11d2e] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#b5121f] ${focusRing}`}
               >
                 Try again
               </button>
@@ -649,7 +649,7 @@ export default function Products() {
                 <button
                   type="button"
                   onClick={clearAll}
-                  className={`mt-5 bg-[#3e9d24] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#2f7d1b] transition-colors ${focusRing}`}
+                  className={`mt-5 bg-[#e11d2e] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b5121f] transition-colors ${focusRing}`}
                 >
                   Clear all filters
                 </button>
@@ -671,7 +671,7 @@ export default function Products() {
                   <button
                     type="button"
                     onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                    className={`border border-[#3e9d24] text-[#2f7d1b] bg-white font-semibold px-8 py-2.5 rounded-full hover:bg-green-50 transition-colors ${focusRing}`}
+                    className={`border border-[#e11d2e] text-[#e11d2e] bg-white font-semibold px-8 py-2.5 rounded-full hover:bg-red-50 transition-colors ${focusRing}`}
                   >
                     Show more
                   </button>
@@ -724,7 +724,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setFiltersOpen(false)}
-                className={`flex-1 bg-[#3e9d24] text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-[#2f7d1b] ${focusRing}`}
+                className={`flex-1 bg-[#e11d2e] text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-[#b5121f] ${focusRing}`}
               >
                 {loading ? "Show results" : `Show ${products.length} ${products.length === 1 ? "product" : "products"}`}
               </button>

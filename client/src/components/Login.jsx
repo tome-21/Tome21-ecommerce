@@ -25,7 +25,7 @@ const GoogleIcon = ({ className }) => (
 
 /**
  * Props
- * - variant: "header" (default, compact pill for the green header)
+ * - variant: "header" (default, compact pill for the dark header)
  *            "large"  (full-width button for login cards and pages)
  */
 export default function Login({ variant = "header" }) {
@@ -40,8 +40,8 @@ export default function Login({ variant = "header" }) {
   const isLarge = variant === "large";
 
   const styles = isLarge
-    ? "w-full justify-center gap-3 px-4 py-3 text-sm rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2"
-    : "gap-2 pl-2 pr-3.5 py-1.5 text-sm rounded-full bg-white text-gray-800 hover:bg-gray-100 shadow-sm focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#3e9d24]";
+    ? "w-full justify-center gap-3 px-4 py-3 text-sm rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2"
+    : "gap-2 pl-2 pr-3.5 py-1.5 text-sm rounded-full bg-white text-gray-800 hover:bg-gray-100 shadow-sm focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111827]";
 
   return (
     <button
@@ -61,10 +61,11 @@ export default function Login({ variant = "header" }) {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-loader-circle preview-icon"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-5 h-5 animate-spin"
+            aria-hidden="true"
           >
             <path d="M21 12a9 9 0 1 1-6.219-8.56" />
           </svg>

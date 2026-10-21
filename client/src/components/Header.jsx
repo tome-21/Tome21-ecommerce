@@ -8,7 +8,7 @@ import {
 import HeaderAuth from "./HeaderAuth";
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#3e9d24]";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111827]";
 
 const HIDE_SEARCH_PATHS = ["/cart", "/checkout", "/orders"];
 
@@ -38,7 +38,7 @@ function SearchBar({ value, onChange, onSubmit, onClear, className = "" }) {
     <form
       role="search"
       onSubmit={onSubmit}
-      className={`flex items-stretch bg-white rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-yellow-300 ${className}`}
+      className={`flex items-stretch bg-white rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#e11d2e] ${className}`}
     >
       <label htmlFor="site-search" className="sr-only">
         Search products
@@ -59,7 +59,7 @@ function SearchBar({ value, onChange, onSubmit, onClear, className = "" }) {
             type="button"
             onClick={onClear}
             aria-label="Clear search"
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 text-lg leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24]"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 text-lg leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e]"
           >
             &times;
           </button>
@@ -68,7 +68,7 @@ function SearchBar({ value, onChange, onSubmit, onClear, className = "" }) {
       <button
         type="submit"
         aria-label="Search"
-        className="px-4 sm:px-5 bg-yellow-400 hover:bg-yellow-300 text-slate-900 transition-colors focus-visible:outline-none focus-visible:bg-yellow-300"
+        className="px-4 sm:px-5 bg-[#e11d2e] hover:bg-[#b5121f] text-white transition-colors focus-visible:outline-none focus-visible:bg-[#b5121f]"
       >
         <SearchIcon className="w-5 h-5" />
       </button>
@@ -120,7 +120,7 @@ export default function Header({ cartCount = 0 }) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#3e9d24] text-white shadow-md">
+    <header className="sticky top-0 z-50 bg-[#111827] text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3 sm:gap-6">
         {/* Logo */}
         <Link
@@ -128,7 +128,7 @@ export default function Header({ cartCount = 0 }) {
           className={`text-2xl sm:text-3xl font-black tracking-tight shrink-0 rounded ${focusRing}`}
           aria-label="Tome21 home"
         >
-          Tome<span className="text-yellow-300">21</span>
+          Tome<span className="text-[#e11d2e]">21</span>
         </Link>
 
         {/* Desktop search */}
@@ -177,7 +177,7 @@ export default function Header({ cartCount = 0 }) {
             {cartCount > 0 && (
               <span
                 aria-hidden="true"
-                className="absolute -top-0.5 left-6 sm:left-5 min-w-[1.15rem] h-[1.15rem] px-1 flex items-center justify-center rounded-full bg-yellow-400 text-slate-900 text-[11px] font-bold leading-none"
+                className="absolute -top-0.5 left-6 sm:left-5 min-w-[1.15rem] h-[1.15rem] px-1 flex items-center justify-center rounded-full bg-[#e11d2e] text-white text-[11px] font-bold leading-none"
               >
                 {cartCount > 99 ? "99+" : cartCount}
               </span>

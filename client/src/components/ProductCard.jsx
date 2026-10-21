@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
 
 const formatPrice = (value) => {
   const n = Number(value);
@@ -93,7 +93,7 @@ const ProductCard = ({ product, onClick, onAddToCart }) => {
         )}
 
         {/* Stretched link: the whole card is clickable, one tab stop */}
-        <h3 className="text-sm sm:text-base font-medium text-gray-800 leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#2f7d1b] transition-colors">
+        <h3 className="text-sm sm:text-base font-medium text-gray-800 leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#e11d2e] transition-colors">
           <Link
             to={`/products/${product.id}`}
             className={`rounded after:absolute after:inset-0 after:content-[''] ${focusRing}`}
@@ -103,7 +103,7 @@ const ProductCard = ({ product, onClick, onAddToCart }) => {
         </h3>
 
         <div className="mt-auto pt-3">
-          <p className="text-lg sm:text-xl font-bold text-[#2f7d1b] leading-none">
+          <p className="text-lg sm:text-xl font-bold text-[#e11d2e] leading-none">
             <span className="text-xs sm:text-sm font-semibold mr-1">ETB</span>
             {formatPrice(product.price)}
           </p>
@@ -119,7 +119,7 @@ const ProductCard = ({ product, onClick, onAddToCart }) => {
               className={`relative z-10 mt-3 w-full rounded-lg py-2 text-sm font-semibold transition-colors ${focusRing} ${
                 outOfStock
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-[#3e9d24] text-white hover:bg-[#2f7d1b]"
+                  : "bg-[#e11d2e] text-white hover:bg-[#b5121f]"
               }`}
             >
               {outOfStock ? "Out of stock" : "Add to cart"}

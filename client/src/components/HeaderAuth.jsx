@@ -4,7 +4,7 @@ import useAuth from "../hooks/useAuth";
 import Login from "./Login";
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#3e9d24]";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111827]";
 
 function Avatar({ user, className = "h-8 w-8" }) {
   const [failed, setFailed] = useState(false);
@@ -16,7 +16,7 @@ function Avatar({ user, className = "h-8 w-8" }) {
   if (!user.image_url || failed) {
     return (
       <span
-        className={`${className} shrink-0 rounded-full bg-yellow-400 text-slate-900 font-bold flex items-center justify-center text-sm`}
+        className={`${className} shrink-0 rounded-full bg-[#e11d2e] text-white font-bold flex items-center justify-center text-sm`}
         aria-hidden="true"
       >
         {initial}
@@ -136,7 +136,7 @@ export default function HeaderAuth() {
               <Link
                 to="/admin"
                 role="menuitem"
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#2f7d1b] hover:bg-green-50 focus-visible:outline-none focus-visible:bg-green-50"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#e11d2e] hover:bg-red-50 focus-visible:outline-none focus-visible:bg-red-50"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -156,14 +156,14 @@ export default function HeaderAuth() {
             <Link
               to="/orders"
               role="menuitem"
-              className="block px-4 py-2.5 text-sm hover:bg-green-50 hover:text-[#2f7d1b] focus-visible:outline-none focus-visible:bg-green-50"
+              className="block px-4 py-2.5 text-sm hover:bg-red-50 hover:text-[#e11d2e] focus-visible:outline-none focus-visible:bg-red-50"
             >
               My orders
             </Link>
             <Link
               to="/cart"
               role="menuitem"
-              className="block px-4 py-2.5 text-sm hover:bg-green-50 hover:text-[#2f7d1b] focus-visible:outline-none focus-visible:bg-green-50"
+              className="block px-4 py-2.5 text-sm hover:bg-red-50 hover:text-[#e11d2e] focus-visible:outline-none focus-visible:bg-red-50"
             >
               My cart
             </Link>
@@ -175,7 +175,7 @@ export default function HeaderAuth() {
                 type="button"
                 role="menuitem"
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:bg-red-50"
+                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:bg-gray-50"
               >
                 Log out
               </button>

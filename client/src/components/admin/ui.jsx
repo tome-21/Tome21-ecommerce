@@ -3,16 +3,16 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 /* ---------- Shared styles ---------- */
 
 export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-lg bg-[#3e9d24] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#2f7d1b] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-[#e11d2e] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#b5121f] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
 
 export const btnGhost =
   "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400";
 
 export const btnDanger =
-  "inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2";
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2";
 
 export const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#3e9d24] focus:ring-2 focus:ring-[#3e9d24]/30";
+  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#e11d2e] focus:ring-2 focus:ring-[#e11d2e]/30";
 
 export const labelClass =
   "mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500";
@@ -82,7 +82,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !busy) onClose();
       }}
@@ -102,7 +102,7 @@ export function Modal({
             onClick={onClose}
             disabled={busy}
             aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-xl leading-none text-slate-400 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24]"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-xl leading-none text-slate-400 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e]"
           >
             &times;
           </button>
@@ -174,7 +174,7 @@ export function useToast() {
   const node = toast ? (
     <div
       role={toast.type === "error" ? "alert" : "status"}
-      className={`fixed bottom-4 right-4 z-[60] max-w-sm rounded-lg px-4 py-3 text-sm font-medium text-white shadow-lg ${
+      className={`fixed bottom-4 right-4 z-[80] max-w-sm rounded-lg px-4 py-3 text-sm font-medium text-white shadow-lg ${
         toast.type === "error" ? "bg-rose-600" : "bg-slate-900"
       }`}
     >
