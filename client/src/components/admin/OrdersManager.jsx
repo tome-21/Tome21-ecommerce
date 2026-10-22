@@ -25,7 +25,7 @@ const STATUSES = [
   {
     id: "delivered",
     label: "Delivered",
-    style: "bg-slate-200 text-slate-800",
+    style: "bg-emerald-100 text-emerald-700",
   },
   { id: "cancelled", label: "Cancelled", style: "bg-rose-100 text-rose-700" },
 ];
@@ -240,9 +240,9 @@ export default function OrdersManager() {
                   type="button"
                   onClick={() => setStatusFilter(s.id)}
                   aria-pressed={active}
-                  className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] ${
+                  className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] ${
                     active
-                      ? "border-[#e11d2e] bg-[#e11d2e] text-white"
+                      ? "border-[#3e9d24] bg-[#3e9d24] text-white"
                       : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
                   }`}
                 >
@@ -365,7 +365,7 @@ export default function OrdersManager() {
                             type="button"
                             onClick={() => setSelectedId(order.id)}
                             aria-label={`View details for order ${order.id}`}
-                            className="rounded-lg bg-red-50 px-3 py-1 font-semibold text-[#e11d2e] transition-colors hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e]"
+                            className="rounded-lg bg-green-50 px-3 py-1 font-semibold text-[#2f7d1b] transition-colors hover:bg-green-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24]"
                           >
                             Details
                           </button>
@@ -565,7 +565,7 @@ function OrderDetailsModal({ orderId, onClose, onStatusChanged, notify }) {
                           type="button"
                           onClick={handleUpdate}
                           disabled={saving}
-                          className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-black disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
+                          className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2"
                         >
                           {saving && <Spinner />}
                           Yes, cancel order
@@ -603,7 +603,7 @@ function OrderDetailsModal({ orderId, onClose, onStatusChanged, notify }) {
                   value={
                     <a
                       href={`mailto:${order.customer_email}`}
-                      className="text-[#e11d2e] hover:underline"
+                      className="text-[#2f7d1b] hover:underline"
                     >
                       {order.customer_email}
                     </a>
@@ -616,7 +616,7 @@ function OrderDetailsModal({ orderId, onClose, onStatusChanged, notify }) {
                   value={
                     <a
                       href={`tel:${order.shipping_phone}`}
-                      className="text-[#e11d2e] hover:underline"
+                      className="text-[#2f7d1b] hover:underline"
                     >
                       {order.shipping_phone}
                     </a>
@@ -659,7 +659,7 @@ function OrderDetailsModal({ orderId, onClose, onStatusChanged, notify }) {
 
             <div className="flex items-center justify-between border-t border-slate-100 pt-4">
               <span className="font-medium text-slate-600">Total</span>
-              <span className="text-2xl font-black text-[#e11d2e]">
+              <span className="text-2xl font-black text-[#3e9d24]">
                 {money(order.total_amount)}
               </span>
             </div>

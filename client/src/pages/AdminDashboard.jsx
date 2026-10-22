@@ -12,7 +12,7 @@ const TABS = [
 ];
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111827]";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -56,16 +56,16 @@ export default function AdminDashboard() {
   const { Component } = active;
 
   return (
-    <div className="min-h-screen bg-slate-100 font-sans text-slate-800">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
       {/* Mobile top bar */}
-      <header className="lg:hidden sticky top-0 z-30 h-14 bg-[#111827] text-white flex items-center gap-3 px-4 shadow-md">
+      <header className="lg:hidden sticky top-0 z-30 h-14 bg-white border-b border-slate-200 flex items-center gap-3 px-4">
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
           aria-label="Open menu"
           aria-expanded={menuOpen}
           aria-controls="admin-sidebar"
-          className={`w-9 h-9 -ml-1 rounded-lg flex items-center justify-center hover:bg-white/10 ${focusRing}`}
+          className={`w-9 h-9 -ml-1 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 ${focusRing}`}
         >
           <svg
             viewBox="0 0 24 24"
@@ -79,10 +79,10 @@ export default function AdminDashboard() {
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <span className="font-black tracking-tight">
-          Tome<span className="text-[#e11d2e]">21</span>
+        <span className="font-bold text-slate-900 tracking-tight">
+          Tome21 <span className="text-slate-400 font-medium">Admin</span>
         </span>
-        <span className="ml-auto text-sm font-medium text-gray-300">
+        <span className="ml-auto text-sm font-semibold text-[#2f7d1b]">
           {active.label}
         </span>
       </header>
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
       {/* Mobile overlay */}
       {menuOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          className="lg:hidden fixed inset-0 z-40 bg-black/40"
           onClick={() => setMenuOpen(false)}
           aria-hidden="true"
         />
@@ -100,27 +100,30 @@ export default function AdminDashboard() {
       <aside
         id="admin-sidebar"
         aria-label="Admin navigation"
-        className={`fixed inset-y-0 left-0 z-50 lg:z-30 w-64 lg:w-60 bg-[#111827] text-white flex flex-col transition-[transform,visibility] duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 lg:z-30 w-64 lg:w-60 bg-white border-r border-slate-200 flex flex-col transition-[transform,visibility] duration-200 lg:translate-x-0 ${
           menuOpen ? "translate-x-0" : "-translate-x-full max-lg:invisible"
         }`}
       >
         {/* Brand */}
-        <div className="h-14 shrink-0 flex items-center justify-between px-5 border-b border-white/10">
-          <Link
-            to="/"
-            aria-label="Back to store"
-            className={`rounded text-xl font-black tracking-tight ${focusRing}`}
-          >
-            Tome<span className="text-[#e11d2e]">21</span>
-            <span className="ml-2 text-sm font-medium text-gray-400">
-              Admin
+        <div className="h-14 shrink-0 flex items-center justify-between px-5 border-b border-slate-200">
+          <div className="flex items-center gap-2.5">
+            <Link
+              to="/"
+              aria-label="Back to store"
+              title="Back to store"
+              className={`w-8 h-8 bg-[#3e9d24] text-white flex items-center justify-center rounded-lg font-bold hover:bg-[#2f7d1b] transition-colors ${focusRing}`}
+            >
+              T
+            </Link>
+            <span className="text-lg font-bold text-slate-900 tracking-tight">
+              Tome21 <span className="text-slate-400 font-medium">Admin</span>
             </span>
-          </Link>
+          </div>
           <button
             type="button"
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu"
-            className={`lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:bg-white/10 ${focusRing}`}
+            className={`lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 ${focusRing}`}
           >
             <svg
               viewBox="0 0 24 24"
@@ -149,8 +152,8 @@ export default function AdminDashboard() {
                     aria-current={selected ? "page" : undefined}
                     className={`w-full text-left rounded-lg px-3 py-2.5 text-sm font-semibold border-l-4 transition-colors ${focusRing} ${
                       selected
-                        ? "bg-white/10 text-white border-[#e11d2e]"
-                        : "text-gray-300 border-transparent hover:bg-white/5 hover:text-white"
+                        ? "bg-green-50 text-[#2f7d1b] border-[#3e9d24]"
+                        : "text-slate-600 border-transparent hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     {tab.label}
@@ -162,18 +165,18 @@ export default function AdminDashboard() {
         </nav>
 
         {/* User + back to store */}
-        <div className="shrink-0 border-t border-white/10 p-4 space-y-3">
+        <div className="shrink-0 border-t border-slate-200 p-4 space-y-3">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">
+            <p className="truncate text-sm font-semibold text-slate-900">
               {user.name}
             </p>
             {user.email && (
-              <p className="truncate text-xs text-gray-400">{user.email}</p>
+              <p className="truncate text-xs text-slate-500">{user.email}</p>
             )}
           </div>
           <Link
             to="/"
-            className={`block w-full text-center rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-white hover:bg-white/10 transition-colors ${focusRing}`}
+            className={`block w-full text-center rounded-lg px-3 py-2 text-sm font-semibold text-[#2f7d1b] border border-[#3e9d24] hover:bg-green-50 transition-colors ${focusRing}`}
           >
             View store
           </Link>

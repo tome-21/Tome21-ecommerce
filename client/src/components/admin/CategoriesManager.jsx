@@ -239,7 +239,7 @@ export default function CategoriesManager() {
                           type="button"
                           onClick={() => setFormTarget(cat)}
                           aria-label={`Edit ${cat.name}`}
-                          className="rounded px-2 py-1 font-semibold text-[#e11d2e] transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e]"
+                          className="rounded px-2 py-1 font-semibold text-[#2f7d1b] transition-colors hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24]"
                         >
                           Edit
                         </button>
@@ -247,7 +247,7 @@ export default function CategoriesManager() {
                           type="button"
                           onClick={() => setDeleteTarget(cat)}
                           aria-label={`Delete ${cat.name}`}
-                          className="ml-1 rounded px-2 py-1 font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+                          className="ml-1 rounded px-2 py-1 font-semibold text-rose-600 transition-colors hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                         >
                           Delete
                         </button>
