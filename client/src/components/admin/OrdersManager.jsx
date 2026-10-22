@@ -11,7 +11,7 @@ import {
   useToast,
 } from "./ui";
 
-const apiEndpoint = import.meta.env.VITE_API_URL";
+const apiEndpoint = import.meta.env.VITE_API_URL;
 const withCreds = { withCredentials: true };
 
 const PAGE_SIZE = 25;

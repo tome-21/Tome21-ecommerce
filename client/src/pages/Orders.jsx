@@ -136,8 +136,8 @@ export default function Orders() {
   const [unauthorized, setUnauthorized] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const [open, setOpen] = useState({}); // { [orderId]: true }
-  const [details, setDetails] = useState({}); // { [orderId]: { loading, error, data } }
+  const [open, setOpen] = useState({});
+  const [details, setDetails] = useState({});
 
   // Set by the Cart page right after an order is placed
   const [placedId, setPlacedId] = useState(

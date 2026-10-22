@@ -51,20 +51,13 @@ export const checkout = async (req, res) => {
 export const getOrders = async (req, res) => {
   try {
     const userId = req.user.id;
-
     const orders = await getOrdersByUserId(userId);
 
-    if (orders.length === 0) {
-      return res.status(404).json({
-        error: "You don't have any orders",
-      });
-    }
-
-    res.status(200).json(orders);
+    return res.status(200).json(orders);
   } catch (error) {
     console.error("Error getting orders:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to get orders",
     });
   }
