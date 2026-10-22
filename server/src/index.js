@@ -68,5 +68,5 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 
 app.listen(port, () => {
-  console.log(`server running on http://localhost:${port}/api`);
+  console.log(`server running`);
 });
