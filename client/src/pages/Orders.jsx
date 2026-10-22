@@ -7,7 +7,7 @@ import axios from "axios";
 const apiEndpoint = import.meta.env.VITE_API_URL;
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
 
 const money = (n) => `ETB ${Number(n || 0).toLocaleString("en-US")}`;
 
@@ -46,7 +46,7 @@ function getStatus(status) {
     case "delivered":
       return {
         label: "Delivered",
-        badge: "bg-gray-100 text-gray-800",
+        badge: "bg-emerald-50 text-emerald-700",
         step: 3,
       };
     case "processing":
@@ -82,7 +82,7 @@ function ProgressTrack({ step }) {
             <div className="flex flex-col items-center">
               <span
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${
-                  done ? "bg-[#e11d2e]" : "bg-gray-200"
+                  done ? "bg-[#3e9d24]" : "bg-gray-200"
                 }`}
               >
                 {done && (
@@ -102,7 +102,7 @@ function ProgressTrack({ step }) {
             {i < STEPS.length - 1 && (
               <span
                 className={`flex-1 h-0.5 mx-2 mb-5 ${
-                  i + 1 < step ? "bg-[#e11d2e]" : "bg-gray-200"
+                  i + 1 < step ? "bg-[#3e9d24]" : "bg-gray-200"
                 }`}
               />
             )}
@@ -241,7 +241,7 @@ export default function Orders() {
       <PageShell>
         <main className="flex-1 flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-sm bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <div className="mx-auto w-14 h-14 rounded-full bg-red-50 text-[#e11d2e] flex items-center justify-center mb-4">
+            <div className="mx-auto w-14 h-14 rounded-full bg-green-50 text-[#3e9d24] flex items-center justify-center mb-4">
               <Icon className="w-7 h-7">
                 <path d={boxPath} />
               </Icon>
@@ -301,16 +301,16 @@ export default function Orders() {
         {showBanner && (
           <div
             role="status"
-            className="mb-5 flex items-start gap-3 rounded-xl bg-white border border-gray-200 text-gray-800 p-4"
+            className="mb-5 flex items-start gap-3 rounded-xl bg-green-50 border border-green-200 text-[#1f4d14] p-4"
           >
-            <span className="shrink-0 w-8 h-8 rounded-full bg-[#e11d2e] text-white flex items-center justify-center">
+            <span className="shrink-0 w-8 h-8 rounded-full bg-[#3e9d24] text-white flex items-center justify-center">
               <Icon className="w-4 h-4">
                 <path d="M5 13l4 4L19 7" />
               </Icon>
             </span>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-gray-900">Order placed</p>
-              <p className="text-sm text-gray-600">
+              <p className="font-bold">Order placed</p>
+              <p className="text-sm">
                 Thank you for your order. We will call you to confirm delivery.
               </p>
             </div>
@@ -318,7 +318,7 @@ export default function Orders() {
               type="button"
               onClick={() => setShowBanner(false)}
               aria-label="Dismiss message"
-              className={`shrink-0 w-7 h-7 rounded flex items-center justify-center hover:bg-gray-100 ${focusRing}`}
+              className={`shrink-0 w-7 h-7 rounded flex items-center justify-center hover:bg-green-100 ${focusRing}`}
             >
               <Icon className="w-4 h-4">
                 <path d="M6 18L18 6M6 6l12 12" />
@@ -336,14 +336,14 @@ export default function Orders() {
             <button
               type="button"
               onClick={() => setReloadKey((k) => k + 1)}
-              className={`self-start sm:self-auto bg-[#e11d2e] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#b5121f] ${focusRing}`}
+              className={`self-start sm:self-auto bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-700 ${focusRing}`}
             >
               Try again
             </button>
           </div>
         ) : orders.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-10 sm:p-14 text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-red-50 text-[#e11d2e] flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-green-50 text-[#3e9d24] flex items-center justify-center mb-4">
               <Icon className="w-8 h-8">
                 <path d={boxPath} />
               </Icon>
@@ -354,7 +354,7 @@ export default function Orders() {
             </p>
             <Link
               to="/products"
-              className={`inline-block bg-[#e11d2e] text-white font-semibold px-8 py-2.5 rounded-full hover:bg-[#b5121f] transition-colors ${focusRing}`}
+              className={`inline-block bg-[#3e9d24] text-white font-semibold px-8 py-2.5 rounded-full hover:bg-[#2f7d1b] transition-colors ${focusRing}`}
             >
               Start shopping
             </Link>
@@ -410,7 +410,7 @@ export default function Orders() {
                       onClick={() => toggle(order.id)}
                       aria-expanded={isOpen}
                       aria-controls={panelId}
-                      className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#e11d2e] hover:underline rounded ${focusRing}`}
+                      className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2f7d1b] hover:underline rounded ${focusRing}`}
                     >
                       {isOpen ? "Hide details" : "View details"}
                       <Icon
@@ -476,7 +476,7 @@ export default function Orders() {
                                     {item.product_id ? (
                                       <Link
                                         to={`/products/${item.product_id}`}
-                                        className={`font-medium text-gray-900 hover:text-[#e11d2e] line-clamp-2 rounded ${focusRing}`}
+                                        className={`font-medium text-gray-900 hover:text-[#2f7d1b] line-clamp-2 rounded ${focusRing}`}
                                       >
                                         {item.name}
                                       </Link>

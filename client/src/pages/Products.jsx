@@ -22,7 +22,7 @@ const CONDITIONS = [
 ];
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
 
 const Icon = ({ children, className = "w-4 h-4" }) => (
   <svg
@@ -79,14 +79,15 @@ function SortDropdown({ value, onChange }) {
 
   const selectedIndex = Math.max(
     0,
-    SORTS.findIndex((s) => s.value === value)
+    SORTS.findIndex((s) => s.value === value),
   );
   const selected = SORTS[selectedIndex];
 
   useEffect(() => {
     if (!open) return;
     const onDown = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target))
+        setOpen(false);
     };
     document.addEventListener("pointerdown", onDown);
     return () => document.removeEventListener("pointerdown", onDown);
@@ -137,7 +138,7 @@ function SortDropdown({ value, onChange }) {
         aria-controls="sort-listbox"
         aria-activedescendant={open ? `sort-opt-${active}` : undefined}
         className={`w-full sm:w-56 flex items-center justify-between gap-2 border rounded-lg bg-white px-3 py-2 text-sm transition-colors ${focusRing} ${
-          open ? "border-[#e11d2e]" : "border-gray-300 hover:border-gray-400"
+          open ? "border-[#3e9d24]" : "border-gray-300 hover:border-gray-400"
         }`}
       >
         <span className="truncate">
@@ -171,14 +172,14 @@ function SortDropdown({ value, onChange }) {
                 onMouseEnter={() => setActive(i)}
                 onClick={() => choose(opt.value)}
                 className={`flex items-center justify-between gap-3 px-4 py-2.5 text-sm cursor-pointer ${
-                  i === active ? "bg-red-50" : ""
+                  i === active ? "bg-green-50" : ""
                 } ${
-                  isSelected ? "text-[#e11d2e] font-semibold" : "text-gray-700"
+                  isSelected ? "text-[#2f7d1b] font-semibold" : "text-gray-700"
                 }`}
               >
                 {opt.label}
                 {isSelected && (
-                  <Icon className="w-4 h-4 text-[#e11d2e]">
+                  <Icon className="w-4 h-4 text-[#3e9d24]">
                     <path d="M5 13l4 4L19 7" />
                   </Icon>
                 )}
@@ -209,7 +210,7 @@ function FilterPanel({
   idPrefix,
 }) {
   const inputClass =
-    "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#e11d2e] focus:ring-1 focus:ring-[#e11d2e]";
+    "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3e9d24] focus:ring-1 focus:ring-[#3e9d24]";
 
   return (
     <div className="divide-y divide-gray-100">
@@ -224,7 +225,7 @@ function FilterPanel({
               aria-pressed={category === ""}
               className={`w-full flex items-center gap-3 text-left px-3 py-2 rounded-lg text-sm transition-colors ${focusRing} ${
                 category === ""
-                  ? "bg-red-50 text-[#e11d2e] font-semibold"
+                  ? "bg-green-50 text-[#2f7d1b] font-semibold"
                   : "text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -249,7 +250,7 @@ function FilterPanel({
                   aria-pressed={active}
                   className={`w-full flex items-center gap-3 text-left px-3 py-2 rounded-lg text-sm transition-colors ${focusRing} ${
                     active
-                      ? "bg-red-50 text-[#e11d2e] font-semibold"
+                      ? "bg-green-50 text-[#2f7d1b] font-semibold"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
@@ -302,7 +303,7 @@ function FilterPanel({
           )}
           <button
             type="submit"
-            className={`mt-3 w-full border border-[#e11d2e] text-[#e11d2e] font-semibold text-sm py-2 rounded-lg hover:bg-red-50 transition-colors ${focusRing}`}
+            className={`mt-3 w-full border border-[#3e9d24] text-[#2f7d1b] font-semibold text-sm py-2 rounded-lg hover:bg-green-50 transition-colors ${focusRing}`}
           >
             Apply price
           </button>
@@ -323,7 +324,7 @@ function FilterPanel({
                 name={`${idPrefix}-condition`}
                 checked={condition === opt.value}
                 onChange={() => onCondition(opt.value)}
-                className="w-4 h-4 accent-[#e11d2e]"
+                className="w-4 h-4 accent-[#3e9d24]"
               />
               {opt.label}
             </label>
@@ -389,7 +390,7 @@ export default function Products() {
       });
       setSearchParams(next);
     },
-    [searchParams, setSearchParams]
+    [searchParams, setSearchParams],
   );
 
   /* Categories (once) */
@@ -399,7 +400,8 @@ export default function Products() {
       .get(`${apiEndpoint}/categories`, { signal: controller.signal })
       .then(({ data }) => setCategories(data))
       .catch((err) => {
-        if (!axios.isCancel(err)) console.error("Failed to fetch categories:", err);
+        if (!axios.isCancel(err))
+          console.error("Failed to fetch categories:", err);
       });
     return () => controller.abort();
   }, []);
@@ -427,7 +429,9 @@ export default function Products() {
       } catch (err) {
         if (axios.isCancel(err)) return;
         console.error("Failed to fetch products:", err);
-        setError("We couldn't load the products. Check your connection and try again.");
+        setError(
+          "We couldn't load the products. Check your connection and try again.",
+        );
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -469,14 +473,18 @@ export default function Products() {
   const chips = [];
   if (q) chips.push({ key: "q", label: `Search: “${q}”`, clear: { q: "" } });
   if (category && categoryName)
-    chips.push({ key: "category", label: categoryName, clear: { category: "" } });
+    chips.push({
+      key: "category",
+      label: categoryName,
+      clear: { category: "" },
+    });
   if (urlMin || urlMax) {
     const label =
       urlMin && urlMax
         ? `ETB ${fmt(urlMin)} – ${fmt(urlMax)}`
         : urlMin
-        ? `From ETB ${fmt(urlMin)}`
-        : `Up to ETB ${fmt(urlMax)}`;
+          ? `From ETB ${fmt(urlMin)}`
+          : `Up to ETB ${fmt(urlMax)}`;
     chips.push({ key: "price", label, clear: { min: "", max: "" } });
   }
   if (condition) {
@@ -544,7 +552,7 @@ export default function Products() {
                   </Icon>
                   Filters
                   {chips.length > 0 && (
-                    <span className="bg-[#e11d2e] text-white text-xs rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
+                    <span className="bg-[#3e9d24] text-white text-xs rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
                       {chips.length}
                     </span>
                   )}
@@ -552,7 +560,9 @@ export default function Products() {
 
                 <SortDropdown
                   value={sort}
-                  onChange={(v) => updateParams({ sort: v === "newest" ? "" : v })}
+                  onChange={(v) =>
+                    updateParams({ sort: v === "newest" ? "" : v })
+                  }
                 />
               </div>
             </div>
@@ -562,14 +572,14 @@ export default function Products() {
                 {chips.map((chip) => (
                   <span
                     key={chip.key}
-                    className="inline-flex items-center gap-1 bg-red-50 text-[#e11d2e] text-xs font-semibold pl-3 pr-1.5 py-1 rounded-full"
+                    className="inline-flex items-center gap-1 bg-green-50 text-[#2f7d1b] text-xs font-semibold pl-3 pr-1.5 py-1 rounded-full"
                   >
                     {chip.label}
                     <button
                       type="button"
                       onClick={() => updateParams(chip.clear)}
                       aria-label={`Remove filter: ${chip.label}`}
-                      className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-200/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e]"
+                      className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-green-200/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24]"
                     >
                       <Icon className="w-3 h-3">
                         <path d="M6 18L18 6M6 6l12 12" />
@@ -605,11 +615,13 @@ export default function Products() {
                     c.id === "" ? "px-4" : "pl-1 pr-4"
                   } ${
                     active
-                      ? "bg-[#e11d2e] border-[#e11d2e] text-white"
+                      ? "bg-[#3e9d24] border-[#3e9d24] text-white"
                       : "bg-white border-gray-300 text-gray-700"
                   }`}
                 >
-                  {c.id !== "" && <CategoryThumb category={c} className="w-7 h-7" />}
+                  {c.id !== "" && (
+                    <CategoryThumb category={c} className="w-7 h-7" />
+                  )}
                   {c.name}
                 </button>
               );
@@ -626,7 +638,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setReloadKey((k) => k + 1)}
-                className={`self-start sm:self-auto bg-[#e11d2e] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#b5121f] ${focusRing}`}
+                className={`self-start sm:self-auto bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-700 ${focusRing}`}
               >
                 Try again
               </button>
@@ -639,7 +651,9 @@ export default function Products() {
             </div>
           ) : products.length === 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 p-10 sm:p-16 text-center">
-              <h2 className="text-lg font-bold text-gray-900">No products found</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                No products found
+              </h2>
               <p className="text-sm text-gray-500 mt-1 max-w-sm mx-auto">
                 {hasFilters
                   ? "Nothing matches your filters. Try removing one or searching for something else."
@@ -649,7 +663,7 @@ export default function Products() {
                 <button
                   type="button"
                   onClick={clearAll}
-                  className={`mt-5 bg-[#e11d2e] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b5121f] transition-colors ${focusRing}`}
+                  className={`mt-5 bg-[#3e9d24] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#2f7d1b] transition-colors ${focusRing}`}
                 >
                   Clear all filters
                 </button>
@@ -666,12 +680,13 @@ export default function Products() {
               {products.length > visible && (
                 <div className="flex flex-col items-center gap-2 mt-8">
                   <p className="text-xs text-gray-500">
-                    Showing {Math.min(visible, products.length)} of {products.length}
+                    Showing {Math.min(visible, products.length)} of{" "}
+                    {products.length}
                   </p>
                   <button
                     type="button"
                     onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                    className={`border border-[#e11d2e] text-[#e11d2e] bg-white font-semibold px-8 py-2.5 rounded-full hover:bg-red-50 transition-colors ${focusRing}`}
+                    className={`border border-[#3e9d24] text-[#2f7d1b] bg-white font-semibold px-8 py-2.5 rounded-full hover:bg-green-50 transition-colors ${focusRing}`}
                   >
                     Show more
                   </button>
@@ -724,9 +739,11 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setFiltersOpen(false)}
-                className={`flex-1 bg-[#e11d2e] text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-[#b5121f] ${focusRing}`}
+                className={`flex-1 bg-[#3e9d24] text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-[#2f7d1b] ${focusRing}`}
               >
-                {loading ? "Show results" : `Show ${products.length} ${products.length === 1 ? "product" : "products"}`}
+                {loading
+                  ? "Show results"
+                  : `Show ${products.length} ${products.length === 1 ? "product" : "products"}`}
               </button>
             </div>
           </div>

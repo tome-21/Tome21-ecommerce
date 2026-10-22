@@ -7,34 +7,22 @@ import { Link } from "react-router-dom";
 
 const apiEndpoint = import.meta.env.VITE_API_URL;
 
-function SkeletonCard() {
-  return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 animate-pulse">
-      <div className="h-40 bg-gray-200 rounded-xl mb-4" />
-      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-      <div className="h-4 bg-gray-200 rounded w-1/2" />
-    </div>
-  );
-}
-
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getData = async () => {
       try {
-        const [categoriesRes, productsRes] = await Promise.all([
-          axios.get(`${apiEndpoint}/categories`),
-          axios.get(`${apiEndpoint}/products/top`),
-        ]);
-        setCategories(categoriesRes.data);
-        setProducts(productsRes.data);
+        const categories = await axios.get(`${apiEndpoint}/categories`);
+        const products = await axios.get(`${apiEndpoint}/products/top`);
+        setCategories(categories.data);
+        setProducts(products.data);
       } catch (error) {
         console.error(error.message);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
     getData();
@@ -44,52 +32,44 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex flex-col space-y-10">
-        {/* Hero */}
-        <div className="w-full min-h-[18rem] bg-gradient-to-br from-[#111827] via-[#1f2937] to-[#111827] rounded-3xl shadow-xl flex items-center justify-between p-8 md:p-12 relative overflow-hidden">
-          <div className="z-10 text-white max-w-lg">
-            <h2 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4 drop-shadow">
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex flex-col space-y-8">
+        {/* Pro Hero / Carousel */}
+        <div className="w-full h-72 bg-gradient-to-r from-[#3e9d24] to-green-400 rounded-2xl shadow-md flex items-center justify-between p-10 relative overflow-hidden group">
+          <div className="z-10 text-white max-w-md">
+            <h2 className="text-4xl font-extrabold mb-3 drop-shadow-sm">
               Shop the best quality products
             </h2>
-            <p className="text-lg text-gray-300 mb-8">
-              Premium electronics, fashion, and more delivered to you without
-              the hassle.
+            <p className="text-lg text-green-50 mb-6 drop-shadow-sm">
+              Premium electronics, fashion, and more delivered to you.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/products">
-                <button className="bg-[#e11d2e] text-white px-7 py-3 rounded-full font-bold hover:bg-[#b5121f] hover:scale-105 transition shadow-lg cursor-pointer">
-                  Order now
-                </button>
-              </Link>
-            </div>
+            <Link to="/products">
+              <button className="bg-white text-[#3e9d24] px-6 py-2 rounded-full font-bold hover:bg-gray-100 transition shadow-sm cursor-pointer">
+                Start Shopping
+              </button>
+            </Link>
           </div>
+          <div className="absolute right-0 top-0 w-64 h-full bg-white opacity-10 skew-x-12 transform translate-x-10"></div>
+          <div className="absolute right-20 bottom-0 w-32 h-32 bg-yellow-400 rounded-full opacity-20 blur-2xl"></div>
         </div>
 
         {/* Categories */}
         <section>
-          <div className="flex items-center justify-between mb-5">
-            <h3 className="text-2xl font-bold text-gray-800">
-              Shop by <span className="text-[#e11d2e]">Category</span>
-            </h3>
-            <Link
-              to="/products"
-              className="text-sm font-semibold text-[#e11d2e] hover:text-[#b5121f] transition"
-            >
-              View all →
-            </Link>
-          </div>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
             {categories.map((category) => (
-              <Link key={category.id} to={`/products?category=${category.id}`}>
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="w-16 h-16 bg-white rounded-full overflow-hidden shadow-sm ring-2 ring-transparent group-hover:ring-[#e11d2e] flex items-center justify-center transition-all duration-300 transform group-hover:-translate-y-1 group-hover:shadow-lg">
+              <Link to={`/products?category=${category.id}`}>
+                <div
+                  key={category.id}
+                  className="flex flex-col items-center group cursor-pointer"
+                >
+                  <div className="w-16 h-16 bg-white rounded-full overflow-hidden shadow-sm flex items-center justify-center text-[#3e9d24] group-hover:text-white transition-all duration-300 transform group-hover:-translate-y-1">
                     <img
                       src={category.image_url}
                       alt={category.name || "Category image"}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-sm font-medium mt-2 text-gray-700 group-hover:text-[#e11d2e] transition-colors text-center">
+
+                  <span className="text-sm font-medium mt-2 text-gray-700 group-hover:text-[#3e9d24] transition-colors">
                     {category.name}
                   </span>
                 </div>
@@ -98,51 +78,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Trending products */}
-        <section id="trending">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-              <span className="w-1.5 h-7 bg-[#e11d2e] rounded-full" />
-              Top Products
-            </h3>
-            <Link
-              to="/products"
-              className="text-sm font-semibold text-[#e11d2e] hover:text-[#b5121f] transition"
-            >
-              See more →
-            </Link>
-          </div>
+        {/*  Product */}
+        <section>
+          <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            Trending Products
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))
-              : products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
-          {!loading && products.length === 0 && (
-            <p className="text-center text-gray-500 py-10">
-              No products to show right now.
-            </p>
-          )}
-        </section>
-
-        {/* Bottom CTA banner */}
-        <section className="rounded-3xl bg-gradient-to-r from-[#111827] to-[#1f2937] text-white p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
-          <div>
-            <h3 className="text-2xl md:text-3xl font-extrabold mb-2">
-              Leave the hassle of delivery to us
-            </h3>
-            <p className="text-gray-300">
-              Anything you want, delivered shop now and we'll handle the rest.
-            </p>
-          </div>
-          <Link to="/products">
-            <button className="bg-[#e11d2e] text-white px-8 py-3 rounded-full font-bold hover:bg-[#b5121f] hover:scale-105 transition shadow-md whitespace-nowrap cursor-pointer">
-              Start Shopping
-            </button>
-          </Link>
         </section>
       </main>
 

@@ -32,7 +32,7 @@ const COLUMNS = [
 ];
 
 const linkClass =
-  "inline-block rounded text-gray-600 hover:text-[#e11d2e] hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
+  "inline-block rounded text-gray-600 hover:text-[#2f7d1b] hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
 
 export default function Footer() {
   return (
@@ -42,10 +42,10 @@ export default function Footer() {
         <div className="col-span-2 md:col-span-1">
           <Link
             to="/"
-            className="inline-block text-2xl font-extrabold tracking-tight text-[#111827] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2"
+            className="inline-block text-2xl font-extrabold tracking-tight text-[#3e9d24] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2"
             aria-label="Tome21 home"
           >
-            Tome<span className="text-[#e11d2e]">21</span>
+            Tome<span className="text-yellow-400">21</span>
           </Link>
           <p className="mt-3 text-gray-500 max-w-xs">
             Quality products delivered to your door in Ethiopia.

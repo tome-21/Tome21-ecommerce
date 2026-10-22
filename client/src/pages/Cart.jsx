@@ -12,7 +12,7 @@ const DELIVERY_FEE = 500; // flat fee in ETB, applied when the cart is not empty
 const ETH_PHONE = /^(?:\+251|251|0)?([79]\d{8})$/;
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d2e] focus-visible:ring-offset-2";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e9d24] focus-visible:ring-offset-2";
 
 const money = (n) => Number(n).toLocaleString("en-US");
 
@@ -242,7 +242,7 @@ export default function Cart() {
       <PageShell>
         <main className="flex-1 flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-sm bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <div className="mx-auto w-14 h-14 rounded-full bg-red-50 text-[#e11d2e] flex items-center justify-center mb-4">
+            <div className="mx-auto w-14 h-14 rounded-full bg-green-50 text-[#3e9d24] flex items-center justify-center mb-4">
               <Icon className="w-7 h-7">
                 <path d={cartPath} />
               </Icon>
@@ -294,7 +294,7 @@ export default function Cart() {
           <button
             type="button"
             onClick={() => setReloadKey((k) => k + 1)}
-            className={`mt-6 bg-[#e11d2e] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b5121f] ${focusRing}`}
+            className={`mt-6 bg-[#3e9d24] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#2f7d1b] ${focusRing}`}
           >
             Try again
           </button>
@@ -309,7 +309,7 @@ export default function Cart() {
       <PageShell>
         <main className="flex-1 flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-md bg-white rounded-xl border border-gray-200 p-10 text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-red-50 text-[#e11d2e] flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-green-50 text-[#3e9d24] flex items-center justify-center mb-4">
               <Icon className="w-8 h-8">
                 <path d={cartPath} />
               </Icon>
@@ -322,7 +322,7 @@ export default function Cart() {
             </p>
             <Link
               to="/products"
-              className={`inline-block bg-[#e11d2e] text-white font-semibold px-8 py-2.5 rounded-full hover:bg-[#b5121f] transition-colors ${focusRing}`}
+              className={`inline-block bg-[#3e9d24] text-white font-semibold px-8 py-2.5 rounded-full hover:bg-[#2f7d1b] transition-colors ${focusRing}`}
             >
               Start shopping
             </Link>
@@ -336,7 +336,7 @@ export default function Cart() {
     `w-full border rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-1 ${
       hasError
         ? "border-red-400 focus:border-red-500 focus:ring-red-500"
-        : "border-gray-300 focus:border-[#e11d2e] focus:ring-[#e11d2e]"
+        : "border-gray-300 focus:border-[#3e9d24] focus:ring-[#3e9d24]"
     }`;
 
   const placeOrderLabel = submitting ? "Placing order…" : "Place order";
@@ -356,7 +356,7 @@ export default function Cart() {
           </div>
           <Link
             to="/products"
-            className={`text-sm font-semibold text-[#e11d2e] hover:underline rounded ${focusRing}`}
+            className={`text-sm font-semibold text-[#2f7d1b] hover:underline rounded ${focusRing}`}
           >
             Continue shopping
           </Link>
@@ -433,7 +433,7 @@ export default function Cart() {
                         <div className="flex items-start justify-between gap-3">
                           <Link
                             to={`/products/${it.product_id}`}
-                            className={`font-medium text-gray-900 hover:text-[#e11d2e] line-clamp-2 rounded ${focusRing}`}
+                            className={`font-medium text-gray-900 hover:text-[#2f7d1b] line-clamp-2 rounded ${focusRing}`}
                           >
                             {it.name}
                           </Link>
@@ -498,7 +498,7 @@ export default function Cart() {
                             type="button"
                             onClick={() => removeItem(it.product_id)}
                             disabled={busy}
-                            className={`text-sm font-medium text-gray-500 hover:text-[#e11d2e] hover:underline rounded disabled:opacity-50 ${focusRing}`}
+                            className={`text-sm font-medium text-red-600 hover:text-red-800 hover:underline rounded disabled:opacity-50 ${focusRing}`}
                           >
                             Remove
                           </button>
@@ -612,7 +612,7 @@ export default function Cart() {
 
             <div className="mt-4 pt-4 border-t border-gray-100 flex items-baseline justify-between">
               <span className="font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-extrabold text-[#e11d2e]">
+              <span className="text-2xl font-extrabold text-[#2f7d1b]">
                 ETB {money(total)}
               </span>
             </div>
@@ -629,7 +629,7 @@ export default function Cart() {
             <button
               type="submit"
               disabled={submitting || hasStockIssue}
-              className={`hidden lg:block mt-5 w-full bg-[#e11d2e] text-white font-bold py-3 rounded-lg hover:bg-[#b5121f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${focusRing}`}
+              className={`hidden lg:block mt-5 w-full bg-[#3e9d24] text-white font-bold py-3 rounded-lg hover:bg-[#2f7d1b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${focusRing}`}
             >
               {placeOrderLabel}
             </button>
@@ -648,7 +648,7 @@ export default function Cart() {
       >
         <div className="min-w-0">
           <p className="text-xs text-gray-500">Total</p>
-          <p className="font-extrabold text-[#e11d2e] leading-tight truncate">
+          <p className="font-extrabold text-[#2f7d1b] leading-tight truncate">
             ETB {money(total)}
           </p>
         </div>
@@ -656,7 +656,7 @@ export default function Cart() {
           type="submit"
           form="checkout-form"
           disabled={submitting || hasStockIssue}
-          className={`flex-1 bg-[#e11d2e] text-white font-bold py-3 rounded-lg active:bg-[#b5121f] disabled:opacity-50 ${focusRing}`}
+          className={`flex-1 bg-[#3e9d24] text-white font-bold py-3 rounded-lg active:bg-[#2f7d1b] disabled:opacity-50 ${focusRing}`}
         >
           {placeOrderLabel}
         </button>
