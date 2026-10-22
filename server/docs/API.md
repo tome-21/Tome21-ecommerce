@@ -1,7 +1,7 @@
 # Tome21 API
 
 Base URL:
-http://localhost:5000/api
+apiurl/api
 
 ## Products
 
@@ -416,7 +416,7 @@ Response:
 Base URL:
 
 ```text
-http://localhost:5000/api/auth
+apiurl/api/auth
 ```
 
 Authentication uses **Google OAuth 2.0** with Passport.js and server-side sessions.

@@ -12,7 +12,7 @@ import {
   useToast,
 } from "./ui";
 
-const apiEndpoint = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const apiEndpoint = import.meta.env.VITE_API_URL;
 
 /* ---------- Small pieces ---------- */
 

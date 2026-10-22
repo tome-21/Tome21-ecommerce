@@ -6,7 +6,7 @@ import axios from "axios";
 
 const apiEndpoint = import.meta.env.VITE_API_URL;
 
-const DELIVERY_FEE = 500; // flat fee in ETB, applied when the cart is not empty
+// const DELIVERY_FEE = 500;
 
 // Ethiopian mobile numbers: 09..., 07..., +2519..., +2517...
 const ETH_PHONE = /^(?:\+251|251|0)?([79]\d{8})$/;
@@ -153,8 +153,8 @@ export default function Cart() {
     (sum, it) => sum + Number(it.price) * it.quantity,
     0,
   );
-  const deliveryFee = items.length > 0 ? DELIVERY_FEE : 0;
-  const total = subtotal + deliveryFee;
+  // const deliveryFee = items.length > 0 ? DELIVERY_FEE : 0;
+  const total = subtotal;
 
   const hasStockIssue = items.some(
     (it) =>
@@ -604,9 +604,6 @@ export default function Cart() {
               </div>
               <div className="flex justify-between">
                 <dt className="text-gray-600">Delivery</dt>
-                <dd className="font-medium text-gray-900">
-                  ETB {money(deliveryFee)}
-                </dd>
               </div>
             </dl>
 
