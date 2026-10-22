@@ -163,6 +163,8 @@ export default function Orders() {
       setError("");
       setUnauthorized(false);
       try {
+        console.log("API endpoint:", apiEndpoint);
+console.log("Orders URL:", `${apiEndpoint}/orders`);
         const { data } = await axios.get(`${apiEndpoint}/orders`, {
           withCredentials: true,
           signal: controller.signal,
