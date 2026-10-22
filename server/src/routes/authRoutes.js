@@ -19,7 +19,7 @@ router.get(
     failureRedirect: `${process.env.CLIENT_URL}/login`,
   }),
   (req, res) => {
-    res.redirect(`${process.env.CLIENT_URL}`);
+    res.redirect(process.env.CLIENT_URL);
   },
 );
 
@@ -30,7 +30,7 @@ router.get("/me", requireAuth, (req, res) => {
   });
 });
 
-// Protected — only logged-in users
+// Logout
 router.post("/logout", requireAuth, (req, res, next) => {
   req.logout((error) => {
     if (error) {
@@ -44,7 +44,7 @@ router.post("/logout", requireAuth, (req, res, next) => {
 
       res.clearCookie("connect.sid");
 
-      res.json({
+      return res.status(200).json({
         message: "Logged out successfully",
       });
     });
