@@ -11,6 +11,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productImageRoutes from "./routes/productImageRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 // auth
 import session from "express-session";
@@ -79,6 +80,7 @@ app.use("/api/product-images", productImageRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/contact", contactRoutes);
 
 app.listen(port, () => {
   console.log(`server running`);
