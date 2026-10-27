@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import axios from "axios";
+import ProductCardSkeleton from "../components/ProductCardSkeleton";
 
 const apiEndpoint = import.meta.env.VITE_API_URL;
 
@@ -335,19 +336,6 @@ function FilterPanel({
   );
 }
 
-function ProductSkeleton() {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
-      <div className="aspect-square bg-gray-200" />
-      <div className="p-3 space-y-2">
-        <div className="h-3 bg-gray-200 rounded w-1/3" />
-        <div className="h-3 bg-gray-200 rounded w-4/5" />
-        <div className="h-5 bg-gray-200 rounded w-1/2" />
-      </div>
-    </div>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
@@ -646,7 +634,7 @@ export default function Products() {
           ) : loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <ProductSkeleton key={i} />
+                <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : products.length === 0 ? (
