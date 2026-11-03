@@ -102,6 +102,9 @@ function SkeletonRows() {
         <div className="h-4 w-36 rounded bg-slate-100" />
       </td>
       <td className="px-6 py-4">
+        <div className="h-4 w-28 rounded bg-slate-100" />
+      </td>
+      <td className="px-6 py-4">
         <div className="h-4 w-16 rounded bg-slate-100" />
       </td>
       <td className="px-6 py-4">
@@ -127,7 +130,6 @@ export default function OrdersManager() {
   const [visible, setVisible] = useState(PAGE_SIZE);
 
   const [selectedId, setSelectedId] = useState(null);
-  const [quickId, setQuickId] = useState(null);
 
   const [toastNode, notify] = useToast();
 
@@ -184,6 +186,8 @@ export default function OrdersManager() {
         o.customer_email,
         o.shipping_phone,
         o.shipping_address,
+        o.payment_reference,
+        o.payment_method,
       ].some((field) => field?.toLowerCase?.().includes(q));
     });
   }, [orders, statusFilter, query]);
@@ -266,7 +270,7 @@ export default function OrdersManager() {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by #, name, email, phone, address…"
+              placeholder="Search by #, name, email, ref, phone…"
               className={inputClass}
             />
           </div>
@@ -299,6 +303,7 @@ export default function OrdersManager() {
                   <th className="hidden px-6 py-3 font-semibold lg:table-cell">
                     Ship to
                   </th>
+                  <th className="px-6 py-3 font-semibold">Payment / Ref</th>
                   <th className="px-6 py-3 font-semibold">Total</th>
                   <th className="px-6 py-3 font-semibold">Status</th>
                   <th className="px-6 py-3 text-right font-semibold">
@@ -312,7 +317,7 @@ export default function OrdersManager() {
                 ) : shown.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       className="px-6 py-10 text-center text-slate-400"
                     >
                       {orders.length === 0
@@ -322,7 +327,6 @@ export default function OrdersManager() {
                   </tr>
                 ) : (
                   shown.map((order) => {
-                    const next = NEXT_STATUS[normStatus(order.status)];
                     return (
                       <tr
                         key={order.id}
@@ -352,6 +356,14 @@ export default function OrdersManager() {
                           </div>
                           <div className="text-xs text-slate-500">
                             {order.shipping_phone}
+                          </div>
+                        </td>
+                        <td className="px-6 py-3">
+                          <div className="font-mono font-medium text-slate-800">
+                            {order.payment_reference || "—"}
+                          </div>
+                          <div className="text-xs uppercase text-slate-500">
+                            {order.payment_method || "manual"}
                           </div>
                         </td>
                         <td className="px-6 py-3 font-bold text-slate-900">
@@ -445,7 +457,6 @@ function OrderDetailsModal({ orderId, onClose, onStatusChanged, notify }) {
   const handleUpdate = async () => {
     if (unchanged || saving) return;
 
-    // Cancelling returns stock and can't be undone, so ask first
     if (target === "cancelled" && !confirmCancel) {
       setConfirmCancel(true);
       return;
@@ -592,6 +603,28 @@ function OrderDetailsModal({ orderId, onClose, onStatusChanged, notify }) {
                   )}
                 </>
               )}
+            </section>
+
+            {/* Payment Info Section */}
+            <section className="space-y-2 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                Payment Verification
+              </h4>
+              <Row label="Method" value={order.payment_method?.toUpperCase()} />
+              <Row
+                label="Reference No"
+                value={
+                  <span className="font-mono">{order.payment_reference}</span>
+                }
+              />
+              <Row
+                label="Payment Status"
+                value={
+                  <span className="capitalize font-semibold text-emerald-700">
+                    {order.payment_status}
+                  </span>
+                }
+              />
             </section>
 
             {/* Customer */}
