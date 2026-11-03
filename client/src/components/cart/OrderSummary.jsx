@@ -48,9 +48,6 @@ export default function OrderSummary({
         {submitting ? "Verifying & Placing..." : "Place Order"}
       </button>
 
-      <p className="hidden lg:block mt-3 text-xs text-gray-400 text-center">
-        Instant payment verification enabled
-      </p>
     </aside>
   );
 }
