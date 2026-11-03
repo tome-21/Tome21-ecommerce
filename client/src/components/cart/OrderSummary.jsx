@@ -10,13 +10,13 @@ export default function OrderSummary({
 }) {
   return (
     <aside className="bg-white rounded-2xl border border-gray-100 shadow-xs p-5 sm:p-6 lg:sticky lg:top-24">
-      <h2 className="text-lg font-bold text-gray-900 mb-4">
-        Order Summary
-      </h2>
+      <h2 className="text-lg font-bold text-gray-900 mb-4">Order Summary</h2>
 
       <dl className="space-y-3 text-sm">
         <div className="flex justify-between text-gray-600">
-          <dt>Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})</dt>
+          <dt>
+            Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
+          </dt>
           <dd className="font-semibold text-gray-900">ETB {money(subtotal)}</dd>
         </div>
         <div className="flex justify-between text-gray-600">
@@ -35,7 +35,10 @@ export default function OrderSummary({
       </div>
 
       {submitError && (
-        <p role="alert" className="mt-4 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">
+        <p
+          role="alert"
+          className="mt-4 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl p-3"
+        >
           {submitError}
         </p>
       )}
@@ -47,7 +50,6 @@ export default function OrderSummary({
       >
         {submitting ? "Verifying & Placing..." : "Place Order"}
       </button>
-
     </aside>
   );
 }
