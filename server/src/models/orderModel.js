@@ -1,12 +1,18 @@
 import { getClient, query } from "../config/db.js";
+import { verifyPayment } from "../services/paymentService.js";
 
-export const createOrder = async (userId, shippingAddress, shippingPhone) => {
+export const createOrderWithPayment = async (
+  userId,
+  shippingAddress,
+  shippingPhone,
+  paymentData,
+) => {
   const client = await getClient();
 
   try {
     await client.query("BEGIN");
 
-    // 1. Get user's cart and lock the products
+    // 1. Get user's cart and lock products
     const cartResult = await client.query(
       `
         SELECT
@@ -24,80 +30,97 @@ export const createOrder = async (userId, shippingAddress, shippingPhone) => {
     );
 
     const cartItems = cartResult.rows;
-
     if (cartItems.length === 0) {
       throw new Error("Cart is empty");
     }
 
-    // 2. Check stock and calculate total
-    let total = 0;
-
+    // 2. Check stock and calculate total amount
+    let totalAmount = 0;
     for (const item of cartItems) {
       if (item.quantity > item.stock) {
-        throw new Error(`Not enough stock for product ${item.product_id}`);
+        throw new Error(`Not enough stock for product ID ${item.product_id}`);
       }
-
-      total += Number(item.price) * item.quantity;
+      totalAmount += Number(item.price) * item.quantity;
     }
 
-    // 3. Create order
+    // 3. Verify payment via Veritas API BEFORE creating the order
+    const verification = await verifyPayment({
+      method: paymentData.method,
+      reference: paymentData.reference,
+      accountSuffix: paymentData.accountSuffix,
+    });
+
+    // 4. Fraud & Amount Validation
+    // Check if reference was already used in the database
+    const existingRef = await client.query(
+      `SELECT id FROM orders WHERE payment_reference = $1`,
+      [verification.reference],
+    );
+    if (existingRef.rows.length > 0) {
+      throw new Error(
+        "This payment reference has already been used for another order",
+      );
+    }
+
+    // Compare verified amount against calculated cart total (allow tiny float tolerance if needed)
+    if (Math.abs(verification.verifiedAmount - totalAmount) > 0.01) {
+      throw new Error(
+        `Paid amount (${verification.verifiedAmount}) does not match order total (${totalAmount})`,
+      );
+    }
+
+    // 5. Create Order
     const orderResult = await client.query(
       `
         INSERT INTO orders (
           user_id,
           total_amount,
           shipping_address,
-          shipping_phone
+          shipping_phone,
+          payment_status,
+          payment_method,
+          payment_reference,
+          status
         )
-        VALUES ($1, $2, $3, $4)
+        VALUES ($1, $2, $3, $4, 'paid', $5, $6, 'confirmed')
         RETURNING *
       `,
-      [userId, total, shippingAddress, shippingPhone],
+      [
+        userId,
+        totalAmount,
+        shippingAddress,
+        shippingPhone,
+        paymentData.method,
+        verification.reference,
+      ],
     );
 
     const order = orderResult.rows[0];
 
-    // 4. Create order items
+    // 6. Create Order Items & Decrease Stock
     for (const item of cartItems) {
       await client.query(
         `
-          INSERT INTO order_items (
-            order_id,
-            product_id,
-            quantity,
-            price
-          )
+          INSERT INTO order_items (order_id, product_id, quantity, price)
           VALUES ($1, $2, $3, $4)
         `,
         [order.id, item.product_id, item.quantity, item.price],
       );
-    }
 
-    // 5. Decrease stock
-    for (const item of cartItems) {
       await client.query(
         `
           UPDATE products
-          SET stock = stock - $1,
-              updated_at = NOW()
+          SET stock = stock - $1, updated_at = NOW()
           WHERE id = $2
         `,
         [item.quantity, item.product_id],
       );
     }
 
-    // 6. Clear cart
-    await client.query(
-      `
-        DELETE FROM cart_items
-        WHERE user_id = $1
-      `,
-      [userId],
-    );
+    // 7. Clear Cart
+    await client.query(`DELETE FROM cart_items WHERE user_id = $1`, [userId]);
 
-    // 7. Everything succeeded
     await client.query("COMMIT");
-
     return order;
   } catch (error) {
     await client.query("ROLLBACK");
@@ -117,7 +140,10 @@ export const getOrdersByUserId = async (userId) => {
         shipping_address,
         shipping_phone,
         created_at,
-        updated_at
+        updated_at,
+        payment_status,
+        payment_method,
+        payment_reference
       FROM orders
       WHERE user_id = $1
       ORDER BY created_at DESC
@@ -187,6 +213,9 @@ export const getAllOrders = async () => {
         o.status,
         o.shipping_address,
         o.shipping_phone,
+        o.payment_status,    -- <-- Added
+        o.payment_method,    -- <-- Added
+        o.payment_reference, -- <-- Added
         o.created_at,
         o.updated_at
       FROM orders o
@@ -211,6 +240,9 @@ export const getOrderByIdForAdmin = async (orderId) => {
         o.status,
         o.shipping_address,
         o.shipping_phone,
+        o.payment_status,    -- <-- Added
+        o.payment_method,    -- <-- Added
+        o.payment_reference, -- <-- Added
         o.created_at,
         o.updated_at
       FROM orders o

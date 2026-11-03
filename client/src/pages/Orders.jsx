@@ -51,8 +51,9 @@ function getStatus(status) {
       };
     case "processing":
     case "shipped":
+    case "confirmed":
       return {
-        label: "Processing",
+        label: "Confirmed / Processing",
         badge: "bg-blue-50 text-blue-700",
         step: 2,
       };
@@ -123,9 +124,6 @@ function PageShell({ children }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
 export default function Orders() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -139,7 +137,6 @@ export default function Orders() {
   const [open, setOpen] = useState({});
   const [details, setDetails] = useState({});
 
-  // Set by the Cart page right after an order is placed
   const [placedId, setPlacedId] = useState(
     location.state?.placedOrderId ?? null,
   );
@@ -147,15 +144,12 @@ export default function Orders() {
     Boolean(location.state?.placedOrderId),
   );
 
-  // Clear the router state so a refresh doesn't show the banner again
   useEffect(() => {
     if (location.state?.placedOrderId) {
       navigate(location.pathname, { replace: true, state: null });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Load orders */
   useEffect(() => {
     const controller = new AbortController();
     (async () => {
@@ -208,7 +202,6 @@ export default function Orders() {
       loadDetails(id);
   };
 
-  // Open the order that was just placed
   useEffect(() => {
     if (!placedId || orders.length === 0) return;
     if (orders.some((o) => String(o.id) === String(placedId))) {
@@ -216,10 +209,8 @@ export default function Orders() {
       loadDetails(placedId);
     }
     setPlacedId(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orders]);
 
-  /* ---------- Loading ---------- */
   if (loading) {
     return (
       <PageShell>
@@ -235,7 +226,6 @@ export default function Orders() {
     );
   }
 
-  /* ---------- Logged out ---------- */
   if (unauthorized) {
     return (
       <PageShell>
@@ -259,24 +249,6 @@ export default function Orders() {
               }
               className={`w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-800 px-4 py-3 rounded-lg transition-colors ${focusRing}`}
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
               Continue with Google
             </button>
           </div>
@@ -297,7 +269,6 @@ export default function Orders() {
             : "Track your deliveries here."}
         </p>
 
-        {/* Order placed banner */}
         {showBanner && (
           <div
             role="status"
@@ -309,9 +280,10 @@ export default function Orders() {
               </Icon>
             </span>
             <div className="flex-1 min-w-0">
-              <p className="font-bold">Order placed</p>
+              <p className="font-bold">Payment Verified & Order Placed!</p>
               <p className="text-sm">
-                Thank you for your order. We will call you to confirm delivery.
+                Your payment was verified successfully. We will call you to
+                confirm delivery.
               </p>
             </div>
             <button
@@ -376,7 +348,7 @@ export default function Orders() {
                   <div className="p-4 sm:p-5">
                     <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
                       <div className="min-w-0">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                           <h2 className="font-bold text-gray-900">
                             Order #{order.id}
                           </h2>
@@ -385,9 +357,17 @@ export default function Orders() {
                           >
                             {status.label}
                           </span>
+                          {order.payment_method && (
+                            <span className="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-0.5 rounded uppercase">
+                              {order.payment_method} (
+                              {order.payment_status || "paid"})
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
                           Placed on {formatDate(order.created_at)}
+                          {order.payment_reference &&
+                            ` • Ref: ${order.payment_reference}`}
                         </p>
                       </div>
 
@@ -497,7 +477,7 @@ export default function Orders() {
                             })}
                           </ul>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-200 text-sm">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-200 text-sm">
                             <div>
                               <p className="text-gray-500">Delivery address</p>
                               <p className="font-medium text-gray-900 mt-0.5">
@@ -509,6 +489,13 @@ export default function Orders() {
                               <p className="text-gray-500">Phone</p>
                               <p className="font-medium text-gray-900 mt-0.5">
                                 {d.data.shipping_phone || order.shipping_phone}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Payment Reference</p>
+                              <p className="font-mono font-medium text-gray-900 mt-0.5">
+                                {order.payment_reference || "N/A"} (
+                                {order.payment_method?.toUpperCase()})
                               </p>
                             </div>
                           </div>

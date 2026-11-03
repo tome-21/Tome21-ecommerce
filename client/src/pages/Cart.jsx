@@ -6,8 +6,6 @@ import axios from "axios";
 
 const apiEndpoint = import.meta.env.VITE_API_URL;
 
-// const DELIVERY_FEE = 500;
-
 // Ethiopian mobile numbers: 09..., 07..., +2519..., +2517...
 const ETH_PHONE = /^(?:\+251|251|0)?([79]\d{8})$/;
 
@@ -56,9 +54,6 @@ function validateAddress(value) {
   return value.trim() ? "" : "Enter your delivery address.";
 }
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
 export default function Cart() {
   const navigate = useNavigate();
 
@@ -72,7 +67,21 @@ export default function Cart() {
   const [actionError, setActionError] = useState("");
 
   const [shipping, setShipping] = useState({ phone: "", address: "" });
-  const [touched, setTouched] = useState({ phone: false, address: false });
+
+  // New Payment States
+  const [payment, setPayment] = useState({
+    method: "telebirr",
+    reference: "",
+    accountSuffix: "",
+  });
+
+  const [touched, setTouched] = useState({
+    phone: false,
+    address: false,
+    reference: false,
+    accountSuffix: false,
+  });
+
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
@@ -153,7 +162,6 @@ export default function Cart() {
     (sum, it) => sum + Number(it.price) * it.quantity,
     0,
   );
-  // const deliveryFee = items.length > 0 ? DELIVERY_FEE : 0;
   const total = subtotal;
 
   const hasStockIssue = items.some(
@@ -163,26 +171,50 @@ export default function Cart() {
 
   const phoneError = touched.phone ? validatePhone(shipping.phone) : "";
   const addressError = touched.address ? validateAddress(shipping.address) : "";
+  const referenceError =
+    touched.reference && !payment.reference.trim()
+      ? "Enter your transaction reference."
+      : "";
+  const suffixError =
+    touched.accountSuffix &&
+    payment.method === "cbe" &&
+    payment.accountSuffix.trim().length !== 8
+      ? "Enter the last 8 digits of your CBE account."
+      : "";
 
   const onShippingChange = (e) => {
     const { name, value } = e.target;
     setShipping((prev) => ({ ...prev, [name]: value }));
   };
-  const onShippingBlur = (e) => {
+
+  const onPaymentChange = (e) => {
+    const { name, value } = e.target;
+    setPayment((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const onBlurField = (e) => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
   };
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setSubmitError("");
-    setTouched({ phone: true, address: true });
+    setTouched({
+      phone: true,
+      address: true,
+      reference: true,
+      accountSuffix: true,
+    });
 
     const pErr = validatePhone(shipping.phone);
     const aErr = validateAddress(shipping.address);
-    if (pErr || aErr) {
-      document.getElementById(pErr ? "phone" : "address")?.focus();
+    const refErr = !payment.reference.trim();
+    const sufErr = payment.method === "cbe" && !payment.accountSuffix.trim();
+
+    if (pErr || aErr || refErr || sufErr) {
       return;
     }
+
     if (hasStockIssue) {
       setSubmitError(
         "Some items are no longer available in the quantity you chose. Update them and try again.",
@@ -200,25 +232,28 @@ export default function Cart() {
         {
           shipping_address: shipping.address.trim(),
           shipping_phone: formattedPhone,
+          payment_method: payment.method,
+          reference: payment.reference.trim(),
+          account_suffix:
+            payment.method === "cbe" ? payment.accountSuffix.trim() : undefined,
         },
         { withCredentials: true },
       );
-      const orderId = data?.id || data?.orderId;
-      setItems([]); // the backend clears the cart
+      const orderId = data?.order?.id || data?.id;
+      setItems([]);
       navigate("/orders", { state: { placedOrderId: orderId } });
     } catch (err) {
       console.error(err);
       setSubmitError(
         err.response?.data?.error ||
           err.response?.data?.message ||
-          "We couldn't place your order. Please try again.",
+          "Payment verification failed. Please check your reference and try again.",
       );
     } finally {
       setSubmitting(false);
     }
   };
 
-  /* ---------- Loading ---------- */
   if (loading) {
     return (
       <PageShell>
@@ -236,7 +271,6 @@ export default function Cart() {
     );
   }
 
-  /* ---------- Logged out ---------- */
   if (unauthorized) {
     return (
       <PageShell>
@@ -258,24 +292,6 @@ export default function Cart() {
               onClick={handleGoogleLogin}
               className={`w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-800 px-4 py-3 rounded-lg transition-colors ${focusRing}`}
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
               Continue with Google
             </button>
           </div>
@@ -284,7 +300,6 @@ export default function Cart() {
     );
   }
 
-  /* ---------- Load error ---------- */
   if (loadError) {
     return (
       <PageShell>
@@ -303,7 +318,6 @@ export default function Cart() {
     );
   }
 
-  /* ---------- Empty ---------- */
   if (items.length === 0) {
     return (
       <PageShell>
@@ -339,9 +353,10 @@ export default function Cart() {
         : "border-gray-300 focus:border-[#3e9d24] focus:ring-[#3e9d24]"
     }`;
 
-  const placeOrderLabel = submitting ? "Placing order…" : "Place order";
+  const placeOrderLabel = submitting
+    ? "Verifying & Placing order…"
+    : "Place order";
 
-  /* ---------- Cart + checkout ---------- */
   return (
     <PageShell withBar>
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-4 sm:py-6">
@@ -510,7 +525,7 @@ export default function Cart() {
               </ul>
             </section>
 
-            {/* Delivery */}
+            {/* Delivery Details */}
             <section
               aria-labelledby="delivery-heading"
               className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6"
@@ -538,7 +553,7 @@ export default function Cart() {
                     autoComplete="tel"
                     value={shipping.phone}
                     onChange={onShippingChange}
-                    onBlur={onShippingBlur}
+                    onBlur={onBlurField}
                     placeholder="0911 234 567"
                     aria-invalid={!!phoneError}
                     aria-describedby={phoneError ? "phone-error" : undefined}
@@ -565,7 +580,7 @@ export default function Cart() {
                     autoComplete="street-address"
                     value={shipping.address}
                     onChange={onShippingChange}
-                    onBlur={onShippingBlur}
+                    onBlur={onBlurField}
                     placeholder="Area, street, landmark (e.g. Bole, near Edna Mall)"
                     aria-invalid={!!addressError}
                     aria-describedby={
@@ -577,6 +592,159 @@ export default function Cart() {
                     <p id="address-error" className="text-xs text-red-600 mt-1">
                       {addressError}
                     </p>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Payment Details Section */}
+            <section
+              aria-labelledby="payment-heading"
+              className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6"
+            >
+              <h2
+                id="payment-heading"
+                className="text-lg font-bold text-gray-900 mb-1"
+              >
+                Payment & Verification
+              </h2>
+              <p className="text-xs text-gray-500 mb-4">
+                Transfer the total amount to our account below, then provide
+                your transaction reference.
+              </p>
+
+              {/* Company Account Instructions Box */}
+              <div className="mb-5 rounded-lg bg-green-50/60 border border-green-200 p-4 text-sm text-gray-800 space-y-2">
+                <p className="font-bold text-[#2f7d1b]">
+                  Step 1: Transfer ETB {money(total)} to one of our accounts:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs sm:text-sm">
+                  <div className="bg-white p-3 rounded border border-green-100 shadow-sm">
+                    <p className="font-bold text-gray-900">
+                      Commercial Bank of Ethiopia (CBE)
+                    </p>
+                    <p className="text-gray-600 mt-0.5">
+                      Account Name:{" "}
+                      <span className="font-semibold text-gray-800">
+                        Tomas Tesfaye
+                      </span>
+                    </p>
+                    <p className="text-gray-600">
+                      Account No:{" "}
+                      <span className="font-mono font-bold text-gray-900">
+                        1000*********
+                      </span>
+                    </p>
+                  </div>
+                  <div className="bg-white p-3 rounded border border-green-100 shadow-sm">
+                    <p className="font-bold text-gray-900">Telebirr Account</p>
+                    <p className="text-gray-600 mt-0.5">
+                      Name:{" "}
+                      <span className="font-semibold text-gray-800">
+                        Tomas Tesfaye
+                      </span>
+                    </p>
+                    <p className="text-gray-600">
+                      Number:{" "}
+                      <span className="font-mono font-bold text-gray-900">
+                        09*********
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Step 2: Choose Payment Method You Used
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPayment((prev) => ({ ...prev, method: "telebirr" }))
+                      }
+                      className={`border rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                        payment.method === "telebirr"
+                          ? "border-[#3e9d24] bg-green-50 text-[#2f7d1b]"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Telebirr
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPayment((prev) => ({ ...prev, method: "cbe" }))
+                      }
+                      className={`border rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                        payment.method === "cbe"
+                          ? "border-[#3e9d24] bg-green-50 text-[#2f7d1b]"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      CBE (Commercial Bank)
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="reference"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Transaction Reference / Receipt No
+                    </label>
+                    <input
+                      id="reference"
+                      name="reference"
+                      type="text"
+                      value={payment.reference}
+                      onChange={onPaymentChange}
+                      onBlur={onBlurField}
+                      placeholder={
+                        payment.method === "telebirr"
+                          ? "e.g. DIR56OU8WP"
+                          : "e.g. FT26184843Q8"
+                      }
+                      aria-invalid={!!referenceError}
+                      className={inputClass(!!referenceError)}
+                    />
+                    {referenceError && (
+                      <p className="text-xs text-red-600 mt-1">
+                        {referenceError}
+                      </p>
+                    )}
+                  </div>
+
+                  {payment.method === "cbe" && (
+                    <div>
+                      <label
+                        htmlFor="accountSuffix"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Your Account Suffix (Last 8 digits)
+                      </label>
+                      <input
+                        id="accountSuffix"
+                        name="accountSuffix"
+                        type="text"
+                        maxLength={8}
+                        value={payment.accountSuffix}
+                        onChange={onPaymentChange}
+                        onBlur={onBlurField}
+                        placeholder="e.g. 12345729"
+                        aria-invalid={!!suffixError}
+                        className={inputClass(!!suffixError)}
+                      />
+                      {suffixError && (
+                        <p className="text-xs text-red-600 mt-1">
+                          {suffixError}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -604,6 +772,7 @@ export default function Cart() {
               </div>
               <div className="flex justify-between">
                 <dt className="text-gray-600">Delivery</dt>
+                <dd className="text-gray-500 font-medium">Free / Calculated</dd>
               </div>
             </dl>
 
@@ -632,7 +801,7 @@ export default function Cart() {
             </button>
 
             <p className="hidden lg:block mt-3 text-xs text-gray-500 text-center">
-              We will use your phone number to confirm delivery.
+              Payment will be instantly verified before placement.
             </p>
           </aside>
         </form>

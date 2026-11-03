@@ -57,12 +57,14 @@ CREATE TABLE cart_items (
 );
 
 -- ORDERS
+
+-- ORDERS (Pay-First Schema)
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
     total_amount NUMERIC(12, 2) NOT NULL
         CHECK (total_amount >= 0),
-    status VARCHAR(30) NOT NULL DEFAULT 'pending'
+    status VARCHAR(30) NOT NULL DEFAULT 'confirmed'
         CHECK (status IN (
             'pending', 'confirmed', 'shipped',
             'delivered', 'cancelled'
@@ -70,7 +72,16 @@ CREATE TABLE orders (
     shipping_address TEXT NOT NULL,
     shipping_phone VARCHAR(20) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    -- Payment details (Mandatory on creation for Pay-First)
+    payment_status VARCHAR(20) NOT NULL DEFAULT 'paid'
+        CHECK (payment_status IN (
+            'pending', 'paid', 'failed', 'refunded'
+        )),
+    payment_method VARCHAR(20) NOT NULL
+        CHECK (payment_method IN ('cbe', 'telebirr')),
+    payment_reference TEXT NOT NULL UNIQUE
 );
 
 -- ORDER ITEMS
