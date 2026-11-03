@@ -44,21 +44,47 @@ export default function PaymentSection({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
           {/* Telebirr Details */}
           <div className="bg-white p-3.5 rounded-xl border border-gray-100 shadow-xs flex items-start gap-3">
-            <img src="/telebirr-logo.svg" alt="Telebirr" className="w-8 h-8 rounded-md object-contain shrink-0" />
+            <img
+              src="/telebirr-logo.svg"
+              alt="Telebirr"
+              className="w-8 h-8 rounded-md object-contain shrink-0"
+            />
             <div>
               <p className="font-bold text-gray-900">Telebirr Account</p>
-              <p className="text-gray-500 text-xs mt-0.5">Name: <span className="font-semibold text-gray-700">Tomas Tesfaye</span></p>
-              <p className="text-gray-500 text-xs">Number: <span className="font-mono font-bold text-gray-900">09*********</span></p>
+              <p className="text-gray-500 text-xs mt-0.5">
+                Name:{" "}
+                <span className="font-semibold text-gray-700">
+                  Tomas Tesfaye
+                </span>
+              </p>
+              <p className="text-gray-500 text-xs">
+                Number:{" "}
+                <span className="font-bold text-gray-900">0973048752</span>
+              </p>
             </div>
           </div>
 
           {/* CBE Details */}
           <div className="bg-white p-3.5 rounded-xl border border-gray-100 shadow-xs flex items-start gap-3">
-            <img src="/cbe-logo.svg" alt="CBE" className="w-8 h-8 rounded-md object-contain shrink-0" />
+            <img
+              src="/cbe-logo.svg"
+              alt="CBE"
+              className="w-8 h-8 rounded-md object-contain shrink-0"
+            />
             <div>
               <p className="font-bold text-gray-900">CBE Account</p>
-              <p className="text-gray-500 text-xs mt-0.5">Name: <span className="font-semibold text-gray-700">Tomas Tesfaye</span></p>
-              <p className="text-gray-500 text-xs">Account: <span className="font-mono font-bold text-gray-900">1000*********</span></p>
+              <p className="text-gray-500 text-xs mt-0.5">
+                Name:{" "}
+                <span className="font-semibold text-gray-700">
+                  Tomas Tesfaye
+                </span>
+              </p>
+              <p className="text-gray-500 text-xs">
+                Account:{" "}
+                <span className="font-bold text-gray-900">
+                  1000352229427
+                </span>
+              </p>
             </div>
           </div>
         </div>
@@ -72,15 +98,23 @@ export default function PaymentSection({
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => setPayment((prev) => ({ ...prev, method: "telebirr" }))}
+              onClick={() =>
+                setPayment((prev) => ({ ...prev, method: "telebirr" }))
+              }
               className={`flex items-center justify-center gap-3.5 border rounded-xl py-3 px-4 transition-all duration-200 cursor-pointer ${
                 payment.method === "telebirr"
                   ? "border-[#3e9d24] bg-green-50/50 ring-2 ring-[#3e9d24]/20"
                   : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
               }`}
             >
-              <img src="/telebirr-logo.svg" alt="" className="w-6 h-6 object-contain" />
-              <span className={`text-sm font-bold ${payment.method === "telebirr" ? "text-[#2f7d1b]" : "text-gray-700"}`}>
+              <img
+                src="/telebirr-logo.svg"
+                alt=""
+                className="w-6 h-6 object-contain"
+              />
+              <span
+                className={`text-sm font-bold ${payment.method === "telebirr" ? "text-[#2f7d1b]" : "text-gray-700"}`}
+              >
                 Telebirr
               </span>
             </button>
@@ -94,8 +128,14 @@ export default function PaymentSection({
                   : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
               }`}
             >
-              <img src="/cbe-logo.svg" alt="" className="w-6 h-6 object-contain" />
-              <span className={`text-sm font-bold ${payment.method === "cbe" ? "text-[#2f7d1b]" : "text-gray-700"}`}>
+              <img
+                src="/cbe-logo.svg"
+                alt=""
+                className="w-6 h-6 object-contain"
+              />
+              <span
+                className={`text-sm font-bold ${payment.method === "cbe" ? "text-[#2f7d1b]" : "text-gray-700"}`}
+              >
                 CBE
               </span>
             </button>
@@ -104,7 +144,10 @@ export default function PaymentSection({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div>
-            <label htmlFor="reference" className="block text-xs font-semibold text-gray-700 mb-1">
+            <label
+              htmlFor="reference"
+              className="block text-xs font-semibold text-gray-700 mb-1"
+            >
               Transaction Reference / Receipt No
             </label>
             <input
@@ -114,18 +157,27 @@ export default function PaymentSection({
               value={payment.reference}
               onChange={onChange}
               onBlur={onBlur}
-              placeholder={payment.method === "telebirr" ? "e.g. DIR56OU8WP" : "e.g. FT26184843Q8"}
+              placeholder={
+                payment.method === "telebirr"
+                  ? "e.g. DIR56OU8WP"
+                  : "e.g. FT26184843Q8"
+              }
               aria-invalid={!!referenceError}
               className={inputClass(!!referenceError)}
             />
             {referenceError && (
-              <p className="text-xs font-semibold text-red-500 mt-1">{referenceError}</p>
+              <p className="text-xs font-semibold text-red-500 mt-1">
+                {referenceError}
+              </p>
             )}
           </div>
 
           {payment.method === "cbe" && (
             <div>
-              <label htmlFor="accountSuffix" className="block text-xs font-semibold text-gray-700 mb-1">
+              <label
+                htmlFor="accountSuffix"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
                 Account Suffix (Last 8 digits)
               </label>
               <input
@@ -141,7 +193,9 @@ export default function PaymentSection({
                 className={inputClass(!!suffixError)}
               />
               {suffixError && (
-                <p className="text-xs font-semibold text-red-500 mt-1">{suffixError}</p>
+                <p className="text-xs font-semibold text-red-500 mt-1">
+                  {suffixError}
+                </p>
               )}
             </div>
           )}
