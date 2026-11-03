@@ -21,9 +21,22 @@ import authRoutes from "./routes/authRoutes.js";
 // admin
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 
+const allowedOrigins = [
+  'https://tome21.com',
+  'https://www.tome21.com'
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   }),
 );
@@ -46,13 +59,6 @@ app.get("/api", async (req, res) => {
 // auth sessions
 
 app.set("trust proxy", 1);
-
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  }),
-);
 
 app.use(
   session({
