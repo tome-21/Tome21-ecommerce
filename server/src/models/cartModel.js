@@ -1,103 +1,71 @@
 import { query } from "../config/db.js";
 
-export const getCartByUserId = async (userId) => {
-  const result = await query(
-    `
-      SELECT
-        ci.id,
-        ci.product_id,
-        p.name,
-        p.price,
-        p.stock,
-        ci.quantity,
-        (p.price * ci.quantity) AS subtotal,
-
-        (
-          SELECT pi.image_url
-          FROM product_images pi
-          WHERE pi.product_id = p.id
-          ORDER BY pi.sort_order ASC, pi.id ASC
-          LIMIT 1
-        ) AS image_url
-
-      FROM cart_items ci
-      JOIN products p
-        ON p.id = ci.product_id
-
-      WHERE ci.user_id = $1
-      ORDER BY ci.id DESC
-    `,
-    [userId],
-  );
-
-  const items = result.rows;
-
-  const totalResult = await query(
-    `
-      SELECT COALESCE(SUM(p.price * ci.quantity), 0) AS total
-      FROM cart_items ci
-      JOIN products p
-        ON p.id = ci.product_id
-      WHERE ci.user_id = $1
-    `,
-    [userId],
-  );
-
-  return {
-    items,
-    total: totalResult.rows[0].total,
-  };
-};
-
 export const addCartItem = async (userId, productId, quantity) => {
   const result = await query(
-    `
-      INSERT INTO cart_items (user_id, product_id, quantity)
-      VALUES ($1, $2, $3)
+    `insert into cart_items(user_id, product_id, quantity)
+        select $1, $2, $3 from products where id = $2 and stock >= $3
+        on conflict (user_id, product_id)
+        do update set quantity = cart_items.quantity + excluded.quantity
+        where cart_items.quantity + excluded.quantity <= (select stock from products where id = excluded.product_id)
+        returning *;`,
+    [userId, productId, quantity],
+  );
+  return result.rows[0];
+};
 
-      ON CONFLICT (user_id, product_id)
-      DO UPDATE SET
-        quantity = cart_items.quantity + EXCLUDED.quantity
-
-      RETURNING *
-    `,
+export const updateCartItem = async (userId, productId, quantity) => {
+  const result = await query(
+    `update cart_items
+    set quantity = $3
+    where user_id = $1 and product_id = $2 and $3 <= (select stock from products where id = $2) returning *;`,
     [userId, productId, quantity],
   );
 
   return result.rows[0];
 };
 
-export const updateCartItem = async (userId, productId, quantity) => {
+export const getCartItem = async (userId, productId) => {
   const result = await query(
-    `UPDATE cart_items
-     SET quantity = $1
-     WHERE user_id = $2
-       AND product_id = $3
-     RETURNING *`,
-    [quantity, userId, productId],
+    `select id, user_id, product_id, quantity 
+    from cart_items where user_id = $1 and product_id = $2;`,
+    [userId, productId],
   );
 
-  return result.rows[0] ?? null;
+  return result.rows[0];
+};
+
+export const getCartByUserId = async (userId) => {
+  const result = await query(
+    `select cart_items.id, cart_items.user_id, cart_items.product_id, cart_items.quantity, products.name, products.price, products.stock, (products.price * cart_items.quantity) as subtotal, (select image_url from product_images where product_id = cart_items.product_id order by sort_order limit 1) as image_url from cart_items 
+    join products on products.id = cart_items.product_id
+    where cart_items.user_id = $1;`,
+    [userId],
+  );
+
+  const total = await query(
+    `select coalesce(sum(products.price * cart_items.quantity), 0) as total from cart_items
+  join products on products.id = cart_items.product_id
+  where cart_items.user_id = $1`,
+    [userId],
+  );
+
+  return { items: result.rows, total: total.rows[0].total };
 };
 
 export const removeCartItem = async (userId, productId) => {
   const result = await query(
-    `DELETE FROM cart_items
-     WHERE user_id = $1
-       AND product_id = $2
-     RETURNING *`,
+    `delete from cart_items where user_id = $1 and product_id = $2 returning *;`,
     [userId, productId],
   );
 
-  return result.rows[0] ?? null;
+  return result.rows[0];
 };
 
 export const clearCart = async (userId) => {
-  await query(
-    `
-      DELETE FROM cart_items
-      WHERE user_id = $1
-    `,
+  const result = await query(
+    `delete from cart_items where user_id = $1 returning *;`,
     [userId],
   );
+
+  return result.rows;
 };

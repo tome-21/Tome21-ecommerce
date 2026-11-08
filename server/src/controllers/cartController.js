@@ -1,56 +1,49 @@
 import {
-  getCartByUserId,
   addCartItem,
   updateCartItem,
+  getCartItem,
+  getCartByUserId,
   removeCartItem,
   clearCart,
 } from "../models/cartModel.js";
-
-export const getCart = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const cart = await getCartByUserId(userId);
-
-    res.status(200).json(cart);
-  } catch (error) {
-    console.error("Error getting cart:", error);
-
-    res.status(500).json({
-      error: "Failed to get cart",
-    });
-  }
-};
+import { getProductById } from "../models/productModel.js";
 
 export const addToCart = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { product_id, quantity } = req.body;
+    const { productId, quantity } = req.body;
 
-    if (!product_id || quantity === undefined) {
+    if (!productId || quantity === undefined) {
       return res.status(400).json({
-        error: "product_id and quantity are required",
+        error: "product id and quantity are required",
       });
     }
 
     if (!Number.isInteger(quantity) || quantity <= 0) {
       return res.status(400).json({
-        error: "quantity must be a positive integer",
+        error: "quantity must be positive number",
       });
     }
 
-    const item = await addCartItem(
-      userId,
-      product_id,
-      quantity
-    );
+    const item = await addCartItem(userId, productId, quantity);
 
-    res.status(201).json(item);
-  } catch (error) {
-    console.error("Error adding to cart:", error);
+    if (!item) {
+      const product = await getProductById(productId);
+      if (!product) {
+        return res.status(404).json({
+          error: "Product not found",
+        });
+      }
+      return res.status(400).json({
+        error: "Not enough stock for this product",
+      });
+    }
 
-    res.status(500).json({
-      error: "Failed to add item to cart",
+    return res.status(201).json(item);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "server error",
     });
   }
 };
@@ -58,39 +51,62 @@ export const addToCart = async (req, res) => {
 export const updateCart = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { productId } = req.params;
     const { quantity } = req.body;
+    const { productId } = req.params;
 
-    if (quantity === undefined) {
+    if (!productId || quantity === undefined) {
       return res.status(400).json({
-        error: "quantity is required",
+        error: "Product id and quantity are required",
       });
     }
 
     if (!Number.isInteger(quantity) || quantity <= 0) {
       return res.status(400).json({
-        error: "quantity must be a positive integer",
+        error: "quantity must be positive number",
       });
     }
 
-    const item = await updateCartItem(
-      userId,
-      productId,
-      quantity
-    );
+    const item = await updateCartItem(userId, productId, quantity);
 
     if (!item) {
-      return res.status(404).json({
-        error: "Cart item not found",
+      const product = await getProductById(productId);
+      if (!product) {
+        return res.status(404).json({
+          error: "Product not found",
+        });
+      }
+      const cartItem = await getCartItem(userId, productId);
+      if (!cartItem) {
+        return res.status(404).json({
+          error: "This item is not in your cart",
+        });
+      }
+      return res.status(400).json({
+        error: "Not enough stock for this product",
       });
     }
 
-    res.status(200).json(item);
+    return res.status(200).json(item);
   } catch (error) {
-    console.error("Error updating cart:", error);
+    console.error(error);
 
+    return res.status(500).json({
+      error: "server error",
+    });
+  }
+};
+
+export const getCartByUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const result = await getCartByUserId(userId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({
-      error: "Failed to update cart",
+      error: "server error",
     });
   }
 };
@@ -100,26 +116,25 @@ export const removeFromCart = async (req, res) => {
     const userId = req.user.id;
     const { productId } = req.params;
 
-    const item = await removeCartItem(
-      userId,
-      productId
-    );
-
-    if (!item) {
-      return res.status(404).json({
-        error: "Cart item not found",
+    if (!productId) {
+      return res.status(400).json({
+        error: "product id is required",
       });
     }
 
-    res.status(200).json({
-      message: "Item removed from cart",
-      item,
-    });
-  } catch (error) {
-    console.error("Error removing cart item:", error);
+    const item = await removeCartItem(userId, productId);
 
-    res.status(500).json({
-      error: "Failed to remove cart item",
+    if (!item) {
+      return res.status(404).json({
+        error: "this product is not in your cart",
+      });
+    }
+    return res.status(200).json(item);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      error: "server error",
     });
   }
 };
@@ -128,16 +143,13 @@ export const clearUserCart = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    await clearCart(userId);
+    const items = await clearCart(userId);
 
-    res.status(200).json({
-      message: "Cart cleared successfully",
-    });
+    return res.status(200).json(items);
   } catch (error) {
-    console.error("Error clearing cart:", error);
-
-    res.status(500).json({
-      error: "Failed to clear cart",
+    console.error(error);
+    return res.status(500).json({
+      error: "server error",
     });
   }
 };

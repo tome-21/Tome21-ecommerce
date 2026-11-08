@@ -22,19 +22,20 @@ import authRoutes from "./routes/authRoutes.js";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 
 const allowedOrigins = [
-  'https://tome21.com',
-  'https://www.tome21.com'
+  "https://tome21.com",
+  "https://www.tome21.com",
+  "http://localhost:5173",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      
+
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,

@@ -2,16 +2,17 @@ import express from "express";
 import { requireAuth } from "../middleware/authMiddleware.js";
 
 import {
-  getCart,
   addToCart,
   updateCart,
   removeFromCart,
   clearUserCart,
+  getCartByUser,
 } from "../controllers/cartController.js";
 
 const router = express.Router();
 
-router.get("/", requireAuth, getCart);
+
+router.get("/", requireAuth, getCartByUser);
 router.post("/", requireAuth, addToCart);
 router.put("/:productId", requireAuth, updateCart);
 router.delete("/:productId", requireAuth, removeFromCart);

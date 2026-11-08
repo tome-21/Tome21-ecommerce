@@ -224,7 +224,7 @@ export default function ProductDetails() {
     if (product?.name) document.title = `${product.name} | Tome21`;
   }, [product]);
 
-  /* More from the same category (skipped if the product has no category_id) */
+  /* More from the same category */
   useEffect(() => {
     setRelated([]);
     if (!product?.category_id) return;
@@ -259,7 +259,10 @@ export default function ProductDetails() {
     try {
       await axios.post(
         `${apiEndpoint}/cart`,
-        { product_id: product.id, quantity },
+        {
+          productId: Number(product.id), // FIX: Changed product_id to productId, forced Number
+          quantity: Number(quantity), // FIX: Forced Number
+        },
         { withCredentials: true },
       );
       if (thenCheckout) {
