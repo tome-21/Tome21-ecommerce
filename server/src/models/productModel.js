@@ -37,7 +37,7 @@ export const getProducts = async ({
   maxPrice,
   condition,
   sortBy = "newest",
-  search, // 1. Accept search/q from controller query params
+  search,
 }) => {
   const conditions = [];
   const values = [];
@@ -63,7 +63,6 @@ export const getProducts = async ({
     addCondition("p.condition = ?", condition);
   }
 
-  // 2. Add keyword search condition for name and description
   if (search && search.trim() !== "") {
     values.push(`%${search.trim()}%`);
     conditions.push(
@@ -122,7 +121,7 @@ export const getProductById = async (id) => {
         p.description,
         p.price,
         p.stock,
-        P.condition,
+        p.condition,
         p.category_id,
         c.name AS category_name,
         p.created_at,

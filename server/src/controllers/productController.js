@@ -9,6 +9,7 @@ import {
 
 import { deleteCloudinaryImage } from "../services/cloudinaryService.js";
 import { getImagesByProductId } from "../models/productImageModel.js";
+import { getCategoryById } from "../models/catagoryModel.js";
 
 export const getFeaturedProducts = async (req, res) => {
   try {
@@ -74,17 +75,50 @@ export const createProductController = async (req, res) => {
     const { name, description, price, stock, condition, category_id } =
       req.body;
 
-    if (!name || !condition || price === undefined || !category_id) {
+    if (
+      !name ||
+      !condition ||
+      !category_id ||
+      stock === undefined ||
+      price === undefined
+    ) {
       return res.status(400).json({
-        error: "name, price, condition and category_id are required",
+        error: "name, condition, price, stock, and category_id are required",
+      });
+    }
+    if (!Number.isInteger(stock) || stock < 0) {
+      return res.status(400).json({
+        error: "stock must be positive number",
+      });
+    }
+    const priceInNumber = Number(price);
+    if (!Number.isFinite(priceInNumber) || priceInNumber < 0) {
+      return res.status(400).json({
+        error: "price must be positive number",
+      });
+    }
+    if (condition !== "used" && condition !== "new") {
+      return res.status(400).json({
+        error: "condition must be either 'used' or 'new'",
+      });
+    }
+    if (!Number.isInteger(category_id) || category_id <= 0) {
+      return res.status(400).json({
+        error: "category-id must be positive number",
+      });
+    }
+    const category = await getCategoryById(category_id);
+    if (!category) {
+      return res.status(404).json({
+        error: "category not found",
       });
     }
 
     const product = await createProduct({
       name,
       description,
-      price,
-      stock: stock ?? 0,
+      price: priceInNumber,
+      stock,
       condition,
       category_id,
     });
@@ -103,25 +137,59 @@ export const updateProductController = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!Number.isInteger(Number(id))) {
+      return res.status(400).json({
+        error: "product id should be number",
+      });
+    }
+
     const { name, description, price, stock, condition, category_id } =
       req.body;
 
     if (
       !name ||
       !condition ||
-      price === undefined ||
+      !category_id ||
       stock === undefined ||
-      !category_id
+      price === undefined
     ) {
       return res.status(400).json({
-        error: "name, condition, price, stock, and category_id are required",
+        error: "name, condition, stock, price, and category_id are required",
       });
     }
 
+    if (!Number.isInteger(stock) || stock < 0) {
+      return res.status(400).json({
+        error: "stock must be positive number",
+      });
+    }
+    const priceInNumber = Number(price);
+    if (!Number.isFinite(priceInNumber) || priceInNumber < 0) {
+      return res.status(400).json({
+        error: "price must be positive number",
+      });
+    }
+    if (condition !== "used" && condition !== "new") {
+      return res.status(400).json({
+        error: "condition must be either 'used' or 'new'",
+      });
+    }
+
+    if (!Number.isInteger(category_id) || category_id <= 0) {
+      return res.status(400).json({
+        error: "category-id must be positive number",
+      });
+    }
+    const category = await getCategoryById(category_id);
+    if (!category) {
+      return res.status(404).json({
+        error: "category not found",
+      });
+    }
     const product = await updateProduct(id, {
       name,
       description,
-      price,
+      price: priceInNumber,
       stock,
       condition,
       category_id,
@@ -147,9 +215,7 @@ export const deleteProductController = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Fetch associated image records before deleting the product.
     const images = await getImagesByProductId(id);
-
     const product = await deleteProduct(id);
 
     if (!product) {
@@ -160,11 +226,9 @@ export const deleteProductController = async (req, res) => {
 
     let imageCleanupFailed = false;
 
-    // Clean up associated Cloudinary images after deleting the product.
     for (const image of images) {
       if (!image.public_id) {
         imageCleanupFailed = true;
-
         console.error(`Image ${image.id} has no public_id`);
         continue;
       }
@@ -173,7 +237,6 @@ export const deleteProductController = async (req, res) => {
         await deleteCloudinaryImage(image.public_id);
       } catch (cleanupError) {
         imageCleanupFailed = true;
-
         console.error(
           `Failed to delete Cloudinary image ${image.public_id}:`,
           cleanupError,
