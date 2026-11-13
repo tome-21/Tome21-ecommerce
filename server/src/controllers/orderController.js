@@ -48,6 +48,11 @@ export const checkout = async (req, res) => {
     });
   } catch (error) {
     console.error("Checkout error:", error);
+    if (error.status === 400){
+      return res.status(400).json({
+        error: "We could not verify this payment. Check the reference and try again." 
+      })
+    }
 
     if (error.code === "23505") {
       return res.status(409).json({
@@ -70,6 +75,7 @@ export const checkout = async (req, res) => {
     ) {
       return res.status(400).json({ error: error.message });
     }
+
 
     return res
       .status(500)
