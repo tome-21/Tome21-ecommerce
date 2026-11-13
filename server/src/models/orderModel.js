@@ -7,12 +7,16 @@ export const createOrderWithPayment = async (
   shippingPhone,
   paymentData,
 ) => {
-  const client = await getClient();
-
   try {
+    const verification = await verifyPayment({
+      method: paymentData.method,
+      reference: paymentData.reference,
+      accountSuffix: paymentData.accountSuffix,
+    });
+    const client = await getClient();
+
     await client.query("BEGIN");
 
-    // 1. Get user's cart and lock products
     const cartResult = await client.query(
       `
         SELECT
@@ -24,6 +28,7 @@ export const createOrderWithPayment = async (
         JOIN products p
           ON p.id = ci.product_id
         WHERE ci.user_id = $1
+        ORDER BY p.id
         FOR UPDATE OF p
       `,
       [userId],
@@ -34,42 +39,21 @@ export const createOrderWithPayment = async (
       throw new Error("Cart is empty");
     }
 
-    // 2. Check stock and calculate total amount
     let totalAmount = 0;
     for (const item of cartItems) {
       if (item.quantity > item.stock) {
         throw new Error(`Not enough stock for product ID ${item.product_id}`);
       }
+
       totalAmount += Number(item.price) * item.quantity;
     }
 
-    // 3. Verify payment via Veritas API BEFORE creating the order
-    const verification = await verifyPayment({
-      method: paymentData.method,
-      reference: paymentData.reference,
-      accountSuffix: paymentData.accountSuffix,
-    });
-
-    // 4. Fraud & Amount Validation
-    // Check if reference was already used in the database
-    const existingRef = await client.query(
-      `SELECT id FROM orders WHERE payment_reference = $1`,
-      [verification.reference],
-    );
-    if (existingRef.rows.length > 0) {
-      throw new Error(
-        "This payment reference has already been used for another order",
-      );
-    }
-
-    // Compare verified amount against calculated cart total (allow tiny float tolerance if needed)
     if (Math.abs(verification.verifiedAmount - totalAmount) > 0.01) {
       throw new Error(
         `Paid amount (${verification.verifiedAmount}) does not match order total (${totalAmount})`,
       );
     }
 
-    // 5. Create Order
     const orderResult = await client.query(
       `
         INSERT INTO orders (
@@ -97,7 +81,6 @@ export const createOrderWithPayment = async (
 
     const order = orderResult.rows[0];
 
-    // 6. Create Order Items & Decrease Stock
     for (const item of cartItems) {
       await client.query(
         `
@@ -117,7 +100,6 @@ export const createOrderWithPayment = async (
       );
     }
 
-    // 7. Clear Cart
     await client.query(`DELETE FROM cart_items WHERE user_id = $1`, [userId]);
 
     await client.query("COMMIT");
@@ -200,7 +182,6 @@ export const getOrderById = async (userId, orderId) => {
   };
 };
 
-// for admin
 export const getAllOrders = async () => {
   const result = await query(
     `
@@ -213,9 +194,9 @@ export const getAllOrders = async () => {
         o.status,
         o.shipping_address,
         o.shipping_phone,
-        o.payment_status,    -- <-- Added
-        o.payment_method,    -- <-- Added
-        o.payment_reference, -- <-- Added
+        o.payment_status,
+        o.payment_method,
+        o.payment_reference,
         o.created_at,
         o.updated_at
       FROM orders o
@@ -240,9 +221,9 @@ export const getOrderByIdForAdmin = async (orderId) => {
         o.status,
         o.shipping_address,
         o.shipping_phone,
-        o.payment_status,    -- <-- Added
-        o.payment_method,    -- <-- Added
-        o.payment_reference, -- <-- Added
+        o.payment_status,
+        o.payment_method,
+        o.payment_reference,
         o.created_at,
         o.updated_at
       FROM orders o

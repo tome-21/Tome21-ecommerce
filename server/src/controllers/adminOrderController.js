@@ -51,6 +51,7 @@ const ORDER_STATUSES = [
 export const updateAdminOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
+
     const status = String(req.body?.status ?? "").toLowerCase();
 
     if (!Number.isInteger(Number(id))) {
@@ -76,7 +77,7 @@ export const updateAdminOrderStatus = async (req, res) => {
     }
 
     if (existing.status === status) {
-      return res.status(200).json(existing); // nothing to do
+      return res.status(200).json(existing);
     }
 
     const updated = await updateOrderStatus(id, status);

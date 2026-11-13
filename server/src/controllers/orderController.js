@@ -15,7 +15,6 @@ export const checkout = async (req, res) => {
       account_suffix,
     } = req.body;
 
-    // Basic validation
     if (!shipping_address?.trim() || !shipping_phone?.trim()) {
       return res
         .status(400)
@@ -50,7 +49,11 @@ export const checkout = async (req, res) => {
   } catch (error) {
     console.error("Checkout error:", error);
 
-    // Send clean error messages back to frontend client
+    if (error.code === "23505") {
+      return res.status(409).json({
+        error: "This payment reference has already been used for another order",
+      });
+    }
     const clientErrors = [
       "Cart is empty",
       "Payment reference is required",
@@ -62,7 +65,8 @@ export const checkout = async (req, res) => {
     if (
       clientErrors.includes(error.message) ||
       error.message.startsWith("Not enough stock") ||
-      error.message.startsWith("Paid amount")
+      error.message.startsWith("Paid amount") ||
+      error.message.startsWith("Payment receiver mismatch")
     ) {
       return res.status(400).json({ error: error.message });
     }
