@@ -20,7 +20,7 @@ export async function veritas(path, init = {}) {
     response = await fetch(`${apiUrl}${path}`, {
       ...init,
       headers,
-      signal: AbortSignal.timeout(50000),
+      signal: AbortSignal.timeout(10000),
     });
     result = await response.json();
   } catch (error) {

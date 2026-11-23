@@ -1,87 +1,108 @@
 import { veritas } from "../utils/veritas.js";
 
-const EXPECTED_CBE_ACCOUNT = process.env.CBE_MERCHANT_ACCOUNT_SUFFIX; 
-const EXPECTED_TELEBIRR_ACCOUNT = process.env.TELEBIRR_MERCHANT_ACCOUNT_NO; 
+function getExpectedAccounts() {
+  const cbeSuffix = process.env.CBE_MERCHANT_ACCOUNT_SUFFIX?.trim();
+  const telebirrAccount = process.env.TELEBIRR_MERCHANT_ACCOUNT_NO?.trim();
 
-if (!EXPECTED_CBE_ACCOUNT || !EXPECTED_TELEBIRR_ACCOUNT) {
-  throw new Error ("provide merchant cbe and telebirr account")
+  if (!cbeSuffix || !telebirrAccount) {
+    throw new Error("Provide merchant CBE and Telebirr account configuration");
+  }
+
+  return { cbeSuffix, telebirrAccount };
 }
 
+function parsePositiveAmount(rawValue, provider) {
+  if (rawValue === null || rawValue === undefined) {
+    throw new Error(`Missing amount in ${provider} verification response`);
+  }
+
+  const cleaned =
+    typeof rawValue === "number"
+      ? String(rawValue)
+      : String(rawValue).replace(/[^0-9.]/g, "");
+
+  const amount = Number.parseFloat(cleaned);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error(`Invalid amount in ${provider} verification response`);
+  }
+
+  return amount;
+}
 
 export async function verifyPayment({ method, reference, accountSuffix }) {
-  
-  if (!reference?.trim()) {
+  const cleanRef = reference?.trim();
+  if (!cleanRef) {
     throw new Error("Payment reference is required");
   }
 
-  
-  if (method === "cbe") {
-    
-    if (!accountSuffix?.trim()) {
+  const normalizedMethod = String(method || "").trim().toLowerCase();
+  const { cbeSuffix, telebirrAccount } = getExpectedAccounts();
+
+  if (normalizedMethod === "cbe") {
+    const cleanSuffix = accountSuffix?.trim();
+    if (!cleanSuffix) {
       throw new Error("CBE account suffix is required");
     }
 
-    
     const response = await veritas("/verify-cbe", {
       method: "POST",
       body: JSON.stringify({
-        reference: reference.trim(),
-        accountSuffix: accountSuffix.trim(),
+        reference: cleanRef,
+        accountSuffix: cleanSuffix,
       }),
     });
 
-    
-
-    const receiverAcc = String(response.receiverAccount || "");
-    
-    if (!receiverAcc.endsWith(EXPECTED_CBE_ACCOUNT)) {
+    const receiverAcc = String(response?.receiverAccount ?? "").trim();
+    if (!receiverAcc || !receiverAcc.endsWith(cbeSuffix)) {
       throw new Error(
         "Payment receiver mismatch. This payment was not deposited to our account.",
       );
     }
 
-    
-    const verifiedAmount = Number(response.amount);
-
     return {
-      reference: response.reference,
-      verifiedAmount,
-      payerName: response.payer,
+      reference: response.reference ?? cleanRef,
+      verifiedAmount: parsePositiveAmount(response.amount, "CBE"),
+      payerName: response.payer ?? null,
     };
   }
 
-  
-  if (method === "telebirr") {
-    const response = await veritas("/verify-telebirr", {
-      method: "POST",
-      body: JSON.stringify({
-        reference: reference.trim(),
-      }),
-    });
+  if (normalizedMethod === "telebirr") {
+  const response = await veritas("/verify-telebirr", {
+    method: "POST",
+    body: JSON.stringify({
+      reference: cleanRef,
+    }),
+  });
 
-    const data = response.data;
-
-    
-    const creditedAccount = String(data.creditedPartyAccountNo || "");
-    if (
-      EXPECTED_TELEBIRR_ACCOUNT &&
-      creditedAccount !== EXPECTED_TELEBIRR_ACCOUNT
-    ) {
-      throw new Error(
-        "Payment receiver mismatch. This payment was not deposited to our Telebirr account.",
-      );
-    }
-
-    
-    const amountStr = data.settledAmount.replace(/[^0-9.]/g, "");
-    const verifiedAmount = parseFloat(amountStr);
-
-    return {
-      reference: data.receiptNo,
-      verifiedAmount,
-      payerName: data.payerName,
-    };
+  if (response?.success === false) {
+    throw new Error(response.error || "Telebirr payment verification failed");
   }
+
+  const data = response?.data;
+  if (!data) {
+    throw new Error("Invalid Telebirr verification response");
+  }
+
+  const status = String(data.transactionStatus ?? "").trim().toLowerCase();
+  if (status !== "completed") {
+    throw new Error(
+      `Telebirr transaction is not completed (status: ${data.transactionStatus || "unknown"})`,
+    );
+  }
+
+  const creditedAccount = String(data.creditedPartyAccountNo ?? "").trim();
+  if (!creditedAccount || creditedAccount !== telebirrAccount) {
+    throw new Error(
+      "Payment receiver mismatch. This payment was not deposited to our Telebirr account.",
+    );
+  }
+
+  return {
+    reference: data.receiptNo ?? cleanRef,
+    verifiedAmount: parsePositiveAmount(data.settledAmount, "Telebirr"),
+    payerName: data.payerName ?? null,
+  };
+}
 
   throw new Error("Unsupported payment method");
 }
