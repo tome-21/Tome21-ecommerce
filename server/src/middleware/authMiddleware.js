@@ -1,5 +1,6 @@
-
-// it is auth middleware and check whether the user is authenticated from the req idk if there is isAuth fn on req if not it send 401
+// it checks if the user is auth or not ig req.isAuthenticated() is from the client
+// if not 401
+// and next to the route handler if is authed
 export const requireAuth = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({
@@ -10,7 +11,7 @@ export const requireAuth = (req, res, next) => {
   next();
 };
 
-// it checks both the user is authenticated and the user role 
+// same but checks if the user is admin or not from req.user.role
 export const requireAdmin = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({

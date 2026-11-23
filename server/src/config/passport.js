@@ -4,6 +4,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { query } from "./db.js";
 
 passport.use(
+  // this obj sends to google to get the user and google send the user data to my callback url
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
@@ -11,6 +12,7 @@ passport.use(
       callbackURL: process.env.CALL_BACK_URL,
     },
 
+    // and this checks if the incoming user is exist from the profile
     async (accessToken, refreshToken, profile, done) => {
       try {
         const googleId = profile.id;
@@ -27,6 +29,7 @@ passport.use(
           [googleId],
         );
 
+        // if the user exists we update the db cuz may be the user changes its data
         if (existingUser.rows.length > 0) {
           const result = await query(
             `
@@ -45,6 +48,7 @@ passport.use(
           return done(null, result.rows[0]);
         }
 
+        // if not exisit it insert new data 
         const result = await query(
           `
             INSERT INTO users (
@@ -67,10 +71,12 @@ passport.use(
   ),
 );
 
+// ig this is sender to the google to get the user profile 
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
+// and this one removes the user from google ig
 passport.deserializeUser(async (id, done) => {
   try {
     const result = await query(

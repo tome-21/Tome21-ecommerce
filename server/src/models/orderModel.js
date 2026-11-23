@@ -7,15 +7,19 @@ export const createOrderWithPayment = async (
   shippingPhone,
   paymentData,
 ) => {
-  try {
-    const verification = await verifyPayment({
-      method: paymentData.method,
-      reference: paymentData.reference,
-      accountSuffix: paymentData.accountSuffix,
-    });
-    const client = await getClient();
+  const verification = await verifyPayment({
+    method: paymentData.method,
+    reference: paymentData.reference,
+    accountSuffix: paymentData.accountSuffix,
+  });
 
+  let client;
+  let inTransaction = false;
+
+  try {
+    client = await getClient();
     await client.query("BEGIN");
+    inTransaction = true;
 
     const cartResult = await client.query(
       `
@@ -103,12 +107,19 @@ export const createOrderWithPayment = async (
     await client.query(`DELETE FROM cart_items WHERE user_id = $1`, [userId]);
 
     await client.query("COMMIT");
+    inTransaction = false;
     return order;
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (client && inTransaction) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("Failed to rollback transaction:", rollbackError);
+      }
+    }
     throw error;
   } finally {
-    client.release();
+    client?.release();
   }
 };
 

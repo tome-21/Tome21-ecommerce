@@ -4,7 +4,7 @@ import { requireAuth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Public — starts Google login
+// this is the route to check if the use is loggedin idk what the scope is and call the passport authenticater
 router.get(
   "/google",
   passport.authenticate("google", {
@@ -12,7 +12,7 @@ router.get(
   }),
 );
 
-// Public — Google redirects here after login
+// this the login route and after login if failed it redirect to the client url/login if loged in it redirect to client url
 router.get(
   "/google/callback",
   passport.authenticate("google", {
@@ -23,14 +23,17 @@ router.get(
   },
 );
 
-// Protected — only logged-in users
+
+// it checkes if user is logedin if it send the userdata back 
 router.get("/me", requireAuth, (req, res) => {
   res.status(200).json({
     user: req.user,
   });
 });
 
-// Logout
+
+// it logout the user using the fn from the user req idk how if err it return the err if not it remove the session ig the cookie check err again and clear cookie named connect.sid
+// and send success msg 
 router.post("/logout", requireAuth, (req, res, next) => {
   req.logout((error) => {
     if (error) {

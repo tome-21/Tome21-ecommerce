@@ -59,6 +59,7 @@ app.get("/api", async (req, res) => {
 
 // auth sessions
 
+// it initialize the session by sending the cookie with name of connect.sid idk how tf is tis goes
 app.set("trust proxy", 1);
 
 app.use(
