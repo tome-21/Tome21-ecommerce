@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const apiEndpoint = import.meta.env.VITE_API_URL;
 

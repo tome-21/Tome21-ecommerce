@@ -20,7 +20,6 @@ const COLUMNS = [
       { label: "About Tome21", to: "/about" },
       { label: "Terms and conditions", to: "/terms" },
       { label: "Privacy policy", to: "/privacy" },
-      { label: "Billing policy", to: "/billing" },
     ],
   },
   {

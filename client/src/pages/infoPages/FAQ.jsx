@@ -1,5 +1,5 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const FAQS = [
   { q: "How do I pay for my order?", a: "You can pay via Telebirr or Commercial Bank of Ethiopia (CBE) using the account details listed at checkout. Remember to copy your transaction reference number!" },

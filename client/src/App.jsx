@@ -1,4 +1,3 @@
-import {} from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
@@ -6,12 +5,13 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
 import AdminDashboard from "./pages/AdminDashboard";
-import Contact from "./pages/Contact";
-import About from "./pages/About";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Safety from "./pages/Safety";
-import FAQ from "./pages/FAQ";
+// info pages
+import Contact from "./pages/infoPages/Contact";
+import About from "./pages/infoPages/About";
+import Terms from "./pages/infoPages/Terms";
+import Privacy from "./pages/infoPages/Privacy";
+import Safety from "./pages/infoPages/Safety";
+import FAQ from "./pages/infoPages/FAQ";
 
 const App = () => {
   return (
