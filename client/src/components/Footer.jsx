@@ -7,9 +7,8 @@ const COLUMNS = [
     title: "Shop",
     links: [
       { label: "All products", to: "/products" },
-      { label: "Traditional Fashion", to: "/products?category=traditional" },
-      { label: "Modern Fashion", to: "/products?category=modern" },
-      { label: "Custom Anime Hoodies", to: "/products?category=anime" },
+      { label: "Traditional Fashion", to: "/products?category=3" },
+      { label: "Modern Fashion", to: "/products?category=4" },
       { label: "My orders", to: "/orders" },
       { label: "Cart", to: "/cart" },
     ],
